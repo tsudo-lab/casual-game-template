@@ -45,10 +45,12 @@ AGENTS.md
 
 docs/
 ├─ GAME_SPEC.md
-└─ BUILD_PLAN.md
+├─ BUILD_PLAN.md
+└─ QA_CHECKLIST.md
 
 Pull Requests
 Source Code
+CI
 ```
 
 Chatの会話だけを正式仕様にしません。実装に入る内容はGitHub側へ残します。
@@ -154,6 +156,8 @@ Codex実装
 ↓
 PR
 ↓
+CI
+↓
 Review
 ↓
 修正
@@ -161,6 +165,16 @@ Review
 Merge
 ↓
 次Task
+```
+
+PR作成時は `.github/pull_request_template.md` のCheck項目を埋めます。
+
+GitHub Actionsでは自動で以下を実行します。
+
+```bash
+npm run typecheck
+npm run lint
+npm test
 ```
 
 ### Codex / 技術レビューで見るもの
@@ -181,6 +195,31 @@ Merge
 - Casual Gameとして重くなっていないか
 - UI / Result / Shareが狙い通りか
 - Gameとして面白くなる方向か
+
+## Device QA
+
+UI / GameView / Layoutを触るTaskでは、`Small screen / Large screen` のような抽象分類だけで済ませません。
+
+標準のSimulator / Emulator Matrixは以下です。
+
+```text
+iPhone SE (3rd generation)
+iPhone 16
+Pixel 8
+```
+
+この3端末を実際に起動して確認します。
+
+Layoutは端末名でHardcodeせず、実際の `width / height / safe area` を基準にResponsiveに調整します。
+
+```text
+検証単位 = 実際のDevice Profile
+Layout判断 = width / height / safe area
+```
+
+つまり、iPhone SEでは余白を詰め、iPhone 16では少し広く見せ、Pixel 8ではAndroid側のSafe AreaやFont Renderingを確認する、といった端末別の最適化は行って構いません。ただし `if iPhone16` のような端末名分岐は避けます。
+
+詳細は `docs/QA_CHECKLIST.md` を使用します。
 
 ## 仕様変更が起きた場合
 
@@ -285,15 +324,17 @@ Use this template
 ↓
 Codex Task 1
 ↓
-PR / Review / Merge
+PR / CI / Review / Merge
 ↓
 Codex Task 2
 ↓
-PR / Review / Merge
+PR / CI / Review / Merge
 ↓
 ...
 ↓
-実機QA
+3端末Simulator / Emulator QA
+↓
+iOS / Android実機QA
 ↓
 Release
 ↓
