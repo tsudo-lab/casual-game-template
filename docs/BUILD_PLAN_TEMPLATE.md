@@ -116,6 +116,8 @@ assets/
 
 - ControllerへVisual固有処理を入れない
 - TemplateのPlaceholder Designへ寄せる必要はない
+- 端末名をHardcodeしてLayout分岐しない
+- 必要な調整は `width / height / safe area` を基準にResponsiveに行う
 
 完了条件:
 
@@ -158,19 +160,39 @@ Templateの共通機能とGameを接続する。
 リリース前に壊れや違和感を減らす。
 ```
 
+`Small screen / Large screen` のような曖昧な確認ではなく、標準Device Matrixを実際に起動して確認します。
+
+### Simulator / Emulator
+
+- [ ] iPhone SE (3rd generation)
+- [ ] iPhone 16
+- [ ] Pixel 8
+
+### 各端末で確認
+
+- [ ] Home
+- [ ] Tutorial
+- [ ] Game
+- [ ] Result
+- [ ] Settings / Privacy
+- [ ] Safe Area
+- [ ] 文字切れ / 折り返し
+- [ ] Button / Touch Area
 - [ ] Core Loopを複数回Play
 - [ ] Game Over直前 / 直後
 - [ ] 連続Retry
 - [ ] NEW BEST
-- [ ] Share cancel / success
-- [ ] Safe Area
-- [ ] Small screen
-- [ ] Large screen
-- [ ] Japanese
-- [ ] English
+- [ ] 日本語
+- [ ] 英語
 - [ ] Haptics ON / OFF
-- [ ] Adsあり / fallback
 - [ ] Performance
+
+### Share / Ads
+
+- [ ] Share cancel / success
+- [ ] Adsあり / fallback
+
+詳細は `docs/QA_CHECKLIST.md` を使います。
 
 Check:
 
