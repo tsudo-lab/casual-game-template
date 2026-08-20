@@ -32,11 +32,11 @@ Keep the tutorial short enough that a first-time player can understand the whole
 
 ## 3. Replace the actual game
 
-The main replacement point is:
+The main mechanics replacement point is:
 
 `src/game/GameView.tsx`
 
-The common shell passes these props:
+The common controller passes these props:
 
 ```ts
 interface GameViewProps {
@@ -54,26 +54,44 @@ Rules:
 - call `onScoreChange` whenever the displayed score changes
 - call `onRunEnd` exactly once when a run ends
 - use `runId` to reset game state after retry
-- do not move common score, retry, share, ad, settings, or high-score logic into the game
+- do not move common score persistence, retry, sharing, ads or navigation into the game
 
 For a larger game, split `src/game/` into `engine.ts`, `GameView.tsx`, components, and tests.
 
-## 4. Change the game visual design
+## 4. Design the title freely
 
-Shared neutral tokens are in `src/ui/theme.ts`.
+The template deliberately separates **behavior from presentation**.
 
-For each title, it is fine to replace the stage design heavily. The reusable boundary is behavior, not visual sameness. Home and result screens can also receive title-specific art while keeping their common actions intact.
+Use these files as the primary visual replacement points:
+
+- `src/design/HomeVisual.tsx` — entire home-screen layout and art direction
+- `src/design/GameVisual.tsx` — play-screen frame/HUD, tutorial, result UI and share-card look
+- `src/game/GameView.tsx` — the interactive stage itself
+- `src/ui/theme.ts` — optional shared colors/tokens for that title
+
+You may completely replace the JSX and styles in `HomeVisual.tsx` and `GameVisual.tsx`. The new title does **not** need to resemble the template or other Tsudo Lab games.
+
+Keep these behavioral contracts intact:
+
+- `HomeVisual` must still expose Play and Settings actions
+- `GameVisual` must still expose Home, tutorial-close, Share and Retry actions
+- the hidden share-card ref must remain available somewhere in `GameVisual` if image sharing is used
+- game mechanics still report score/run-end through `GameView`
+
+The controller files under `src/screens/` should normally need no design edits.
+
+Example: for PON, `HomeVisual` could be a white full-screen scene with floating glossy balls and no visible card structure, while another game could use typography, illustrations or a completely different composition. Both still use the same navigation, storage and ad behavior.
 
 ## 5. What is already common
 
 The template already includes:
 
-- Home screen
-- Game shell
+- Home controller
+- Game-session controller
 - Best-score persistence
-- One-time tutorial overlay
+- One-time tutorial state
 - Retry flow
-- Share-card generation
+- Share-card image generation behavior
 - Haptics setting
 - Japanese / English setting
 - Settings screen
@@ -105,6 +123,7 @@ For the 3-releases-per-week strategy, aim to spend almost all game-specific work
 
 1. `src/config/game.ts`
 2. `src/game/`
-3. title-specific visual assets / theme overrides
+3. `src/design/`
+4. title-specific assets / `src/ui/theme.ts`
 
-If a new game repeatedly requires edits elsewhere, consider whether that feature belongs in the shared template instead.
+If a new game repeatedly requires edits to controller, storage, service or navigation files, consider whether that feature belongs in the shared template instead.
