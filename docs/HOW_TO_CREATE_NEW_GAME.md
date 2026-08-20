@@ -1,47 +1,94 @@
-# How to create a new Tsudo Lab casual game
+# 新しいつどラボのカジュアルゲームを作る方法
 
-This repository is the current **Casual Game Template**. Its job is to make short-session mobile games fast to build while keeping each title's mechanic and visual identity independent.
+このRepositoryは、つどラボの **Casual Game Template** です。短時間で遊べるモバイルゲームを素早く作りつつ、各タイトルのゲーム性と見た目は独立して作れるようにしています。
 
-## 1. Decide whether this template fits
+## 1. このTemplateを使うゲームか確認する
 
-Use this template when the app is roughly:
+おおむね次の流れなら、このTemplateが向いています。
 
 ```text
 Home
 → Play
-→ score / progress during one run
-→ result
-→ retry / share
+→ 1プレイ中にscore / progressが進む
+→ Result
+→ Retry / Share
 ```
 
-Good fits include score attack, 2048-style casual puzzle, timing, reflex, physics, merge, swipe, and other short-session solo games.
+例:
 
-Do not force a game into this template if it fundamentally needs stage select/progression or a party-game setup flow. Those may become separate templates later when a real title requires them.
+- スコアアタック
+- 2048系のカジュアルパズル
+- タイミングゲーム
+- 反射神経ゲーム
+- 物理ゲーム
+- Merge系
+- Swipe系
+- その他の短時間1人用ゲーム
 
-## 2. Copy the template
+ステージ選択や進行管理が中心のゲーム、複数人のセットアップやターン進行が中心のパーティゲームなど、アプリの流れそのものが違う場合は無理にこのTemplateへ合わせません。
 
-Create a new repository from this codebase, then change app identifiers in `app.json`.
+## 2. まずChatGPT Chatで仕様を固める
 
-At minimum update:
+実装前に、ゲームとしての重要な判断を先に決めます。
+
+最低限、以下を決めます。
+
+- 一言で説明できるゲームコンセプト
+- プレイヤーの基本操作
+- ルール
+- 1プレイの開始条件 / 終了条件
+- Score / BESTの定義
+- Result画面で見せる内容
+- Shareする内容
+- MVPで入れる機能 / 入れない機能
+- 見た目の方向性
+
+`docs/GAME_SPEC_TEMPLATE.md` をコピーして、新しいゲーム側に `docs/GAME_SPEC.md` として置く想定です。
+
+## 3. 実装タスクへ分解する
+
+仕様が固まったら、`docs/BUILD_PLAN_TEMPLATE.md` を元に `docs/BUILD_PLAN.md` を作ります。
+
+1つの巨大タスクにせず、Codexへ渡しやすい単位に分けます。
+
+例:
+
+```text
+Task 1: Game engine / mechanics
+Task 2: GameView / input
+Task 3: Home / Game / Result design
+Task 4: Share / haptics / common integration
+Task 5: QA / release preparation
+```
+
+原則として、1つのTaskで関係ない領域をまとめて変更しません。
+
+## 4. Templateから新しいRepositoryを作る
+
+GitHubの **Use this template** から、新しいゲーム用Repositoryを作ります。
+
+その後、`app.json` の識別子を各ゲーム用へ変更します。
+
+最低限確認するもの:
 
 - `expo.name`
 - `expo.slug`
 - `expo.scheme`
 - `ios.bundleIdentifier`
 - `android.package`
-- production AdMob configuration before release
+- Productionリリース前のAdMob設定
 
-## 3. Change game metadata
+## 5. ゲーム固有情報を変更する
 
-Edit `src/config/game.ts` and set the game id, title, subtitle, tutorial copy, score label, and share message.
+`src/config/game.ts` を編集し、ゲームID、タイトル、サブタイトル、Tutorial文言、Scoreラベル、Share文言などを設定します。
 
-## 4. Replace the actual game
+## 6. 実際のゲームを置き換える
 
-The main mechanics replacement point is:
+ゲーム本体の主な差し替えポイントは以下です。
 
 `src/game/GameView.tsx`
 
-The common controller passes a small contract:
+共通Controllerとの契約は小さく保ちます。
 
 ```ts
 interface GameViewProps {
@@ -53,25 +100,43 @@ interface GameViewProps {
 }
 ```
 
-Keep game-specific state and logic under `src/game/`. Report score changes and run completion to the controller rather than moving persistence, ads, sharing, or navigation into the game implementation.
+ゲーム固有のstate / logicは `src/game/` に置きます。
 
-## 5. Design the title freely
+Score変化とRun終了だけ共通Controllerへ通知し、保存・広告・Share・Navigationなどの共通処理をゲーム本体へ持ち込まないことを基本とします。
 
-The template separates behavior from presentation.
+## 7. デザインはゲームごとに自由に作る
 
-Primary visual replacement points:
+Templateは、BehaviorとPresentationを分離しています。
 
-- `src/design/HomeVisual.tsx` — entire home-screen composition
-- `src/design/GameVisual.tsx` — HUD, result/tutorial UI, share-card look
-- `src/game/GameView.tsx` — interactive stage itself
-- `src/ui/theme.ts` — optional title-specific tokens
-- `assets/` — title-specific visuals
+主な見た目の差し替え場所:
 
-The new game does not need to resemble any other Tsudo Lab title.
+- `src/design/HomeVisual.tsx` — Home画面全体
+- `src/design/GameVisual.tsx` — HUD / Tutorial / Result / Share Card
+- `src/game/GameView.tsx` — 実際のゲーム領域
+- `src/ui/theme.ts` — 必要に応じたゲーム固有token
+- `assets/` — ゲーム固有の画像等
 
-## 6. Phase 1 is the default
+新しいゲームは、他のつどラボ作品と似た見た目にする必要はありません。
 
-Every new casual game starts lightweight:
+## 8. CodexにはTask単位で依頼する
+
+基本は `docs/GAME_SPEC.md` と `docs/BUILD_PLAN.md` を読ませて、Task単位で実装を依頼します。
+
+例:
+
+```text
+AGENTS.md、docs/GAME_SPEC.md、docs/BUILD_PLAN.mdを読んでください。
+今回はBUILD_PLANのTask 1だけ実装してください。
+Homeや広告には触らないでください。
+必要なテストを追加し、typecheck / lint / testを実行してください。
+完了したら変更点と未確認事項をまとめてください。
+```
+
+最初から「ゲームを全部完成させて」と依頼するより、PRごとに範囲を絞ります。
+
+## 9. Phase 1を標準とする
+
+すべての新規カジュアルゲームは、まず軽量なPhase 1から始めます。
 
 ```text
 Phase 1
@@ -80,34 +145,45 @@ Phase 1
 - retry
 - share
 - ads
-- settings/tutorial
+- settings / tutorial
 ```
 
-The purpose is to release quickly and determine whether the core loop is worth growing.
+目的は、機能を増やすことではなく、コアゲームが繰り返し遊ばれるかを早く確認することです。
 
-## 7. Phase 1.5: measure before adding features
+## 10. Phase 1.5で計測する
 
-Analytics should eventually provide comparable signals across titles, such as game start/end, retry, score, share, play frequency, and retention-related behavior.
+必要になったらAnalyticsを追加し、各ゲームで比較できる指標を取ります。
 
-Do not judge a title only by installs. A smaller game with strong replay may be a better Phase 2 candidate than a larger game people open once.
+候補:
 
-## 8. Phase 2: grow winners only
+- game start / end
+- retry
+- score
+- share
+- play frequency
+- retentionに関係する行動
 
-Only successful titles should receive optional growth features such as:
+Install数だけで勝ち負けを決めません。Installが少なくてもRetryや再訪が強いゲームは、Phase 2候補になり得ます。
+
+## 11. Phase 2は当たったゲームだけ
+
+伸びたゲームにだけ、必要に応じてGrowth機能を追加します。
+
+例:
 
 - leaderboard
-- daily challenge / common seed
+- daily challenge / same seed
 - friend-record challenge
 
-These belong conceptually under `src/modules/growth/` and may use services such as Supabase when needed.
+これらは概念上 `src/modules/growth/` に置きます。永続化、匿名identity、score validationなどが必要になれば、その段階でSupabase等のBackendを検討します。
 
-Do not automatically add profiles, follower systems, seasons, real-time multiplayer, or other heavy live-service features to casual games.
+プロフィール、フォロー、シーズン、リアルタイム対戦などを標準機能として追加しません。
 
-## 9. Module policy
+## 12. モジュール方針
 
-Modules stay inside this repository for now. Do not create a separate modules repository prematurely.
+現時点では、Module用の別Repositoryは作りません。
 
-Planned conceptual groups:
+将来的な整理先:
 
 ```text
 src/modules/
@@ -126,20 +202,54 @@ src/modules/
    └─ notifications
 ```
 
-This is a destination architecture, not a requirement to create empty code. Extract shared packages only after multiple templates genuinely reuse the same implementation.
+これは将来の整理先であり、空実装を作るための設計図ではありません。
 
-## 10. Future template family
+複数のTemplateで本当に同じ実装を使うようになってから、共通Package / Repositoryへの切り出しを検討します。
 
-Do not build these now, but keep the boundary clear:
+## 13. 将来のTemplate
+
+今は作りませんが、境界だけは明確にしておきます。
 
 ```text
-tsudo-lab-game-template      = Casual Game Template (current)
-future stage-game-template   = stage select / clear / progression
-future party-game-template   = lightweight mobile party games
+casual-game-template      = 現在の短時間カジュアル向け
+stage-game-template       = 将来のStage選択 / Clear / Progression向け
+party-game-template       = 将来の軽量Mobile Party向け
 ```
 
-Long-running Pochi-style games and Steam / Switch titles are separate development lines rather than extensions of this React Native casual template.
+ポチゲー系長期運営ゲームやSteam / Switch向けタイトルは、Casual Templateの拡張ではなく別の開発ラインとして扱います。
 
-## Before production
+## 14. ゲーム開発中にTemplateへ戻すもの
 
-Verify identifiers, assets, production ads/consent, privacy/data-safety declarations, sharing, safe areas, typecheck/lint/tests, and real-device behavior before shipping.
+新しいゲームを作っていて、複数タイトルでもそのまま使える改善が見つかった場合だけTemplateへ戻します。
+
+```text
+ゲーム固有の処理 → そのゲームに残す
+複数ゲームで共通になる処理 → Templateへ戻す候補
+```
+
+例:
+
+- PON固有のBall physics → PON側
+- Share画像生成の共通改善 → Template側
+- 広告制御の共通Bug修正 → Template側
+
+Templateは「すべてを抽象化する場所」ではなく、「新作を作るたびに本当に共通だったものだけ学習する基盤」として扱います。
+
+## リリース前
+
+以下を確認してください。
+
+- iOS / Android identifiers
+- icon / splash / assets
+- Production AdMob IDs
+- UMP / consent
+- Privacy Policy
+- Store privacy / Data Safety
+- Share実機確認
+- Safe Area
+- `npm install`
+- `npm run typecheck`
+- `npm run lint`
+- `npm test`
+- iOS実機
+- Android実機
