@@ -224,3 +224,38 @@ Game開発中に共通改善が見つかっても、その場でCasual Template�
 Game固有 → Game側に残す
 複数Gameでそのまま使える → TemplateへのBackport候補
 ```
+
+## 13. 端末別Layout / QA
+
+UIやGameViewを変更する場合、`Small / Large` のような抽象的な画面分類だけで完了扱いにしません。
+
+標準確認端末は以下です。
+
+```text
+iPhone SE (3rd generation)
+iPhone 16
+Pixel 8
+```
+
+詳細は `docs/QA_CHECKLIST.md` を確認してください。
+
+重要な原則:
+
+```text
+検証単位 = 実際のDevice Profile
+Layout判断 = width / height / safe area
+```
+
+端末名HardcodeによるLayout分岐は避けてください。
+
+避ける例:
+
+```ts
+if (deviceName === 'iPhone 16') {
+  // ...
+}
+```
+
+必要なResponsive調整は `useWindowDimensions()` やSafe Area Insetsなど、実際のViewport情報を使って実装してください。
+
+同じUIを全Viewportで完全に同じ比率に保つ必要はありません。小さい画面では余白やGame Areaを詰め、大きい画面ではHUDやGame ObjectのSizeを調整するなど、各Viewportで最適な見た目になるよう調整して構いません。
