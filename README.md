@@ -6,19 +6,34 @@ The purpose of this repository is simple: **reuse the app infrastructure and spe
 
 ## Shared by default
 
-- Home screen
-- Game shell
-- Best-score persistence
-- One-time tutorial
-- Retry flow
-- Result sharing as an image
-- Haptics setting
+The shared layer owns behavior, not art direction:
+
+- navigation
+- best-score persistence
+- one-time tutorial state
+- retry flow
+- result sharing as an image
+- haptics setting
 - Japanese / English setting
-- Settings screen
-- Privacy placeholder
+- settings / privacy behavior
 - AdMob initialization / UMP hook
-- Interstitial cadence after completed runs
+- interstitial cadence after completed runs
 - Web / Expo Go ad-safe fallback
+
+## Freely replaceable per game
+
+Each title can look completely different. The intended visual replacement points are:
+
+```text
+src/design/HomeVisual.tsx   # entire home-screen presentation
+src/design/GameVisual.tsx   # game chrome, HUD, tutorial/result UI, share card
+src/game/GameView.tsx       # actual interactive game
+src/ui/theme.ts             # colors/tokens when useful
+```
+
+`HomeScreen.tsx` and `GameScreen.tsx` are controllers. They load/save data and expose actions to the visual components. A redesign should normally change files under `src/design/` without moving storage, ads, sharing, navigation or retry logic into them.
+
+So PON, a timing game and a swipe puzzle can share the same infrastructure while having unrelated home screens and play-screen art direction.
 
 ## Game-specific surface
 
@@ -26,11 +41,12 @@ Most new-game work should stay in:
 
 ```text
 src/config/game.ts
+src/design/
 src/game/
-src/ui/theme.ts   # only when the title needs a different visual system
+src/ui/theme.ts
 ```
 
-`src/game/GameView.tsx` is the primary replacement point. It reports score and game-over events to the reusable `GameScreen` shell.
+`src/game/GameView.tsx` reports score and game-over events to the reusable controller. `src/design/` determines how those states look.
 
 ## Structure
 
@@ -39,12 +55,15 @@ App.tsx
 src/
 ├─ config/
 │  └─ game.ts
+├─ design/
+│  ├─ HomeVisual.tsx
+│  └─ GameVisual.tsx
 ├─ game/
 │  ├─ GameView.tsx
 │  └─ types.ts
 ├─ screens/
-│  ├─ HomeScreen.tsx
-│  ├─ GameScreen.tsx
+│  ├─ HomeScreen.tsx       # common controller
+│  ├─ GameScreen.tsx       # common controller
 │  └─ MenuScreen.tsx
 ├─ services/
 │  ├─ adMob.ts
@@ -77,7 +96,7 @@ npm test
 
 See [`docs/HOW_TO_CREATE_NEW_GAME.md`](docs/HOW_TO_CREATE_NEW_GAME.md).
 
-The included `GameView` is intentionally a tiny placeholder game so the common shell can be exercised immediately. Replace it rather than building new app infrastructure around it.
+The included `GameView` and visual components are intentionally simple placeholders. Replace their game-specific content and visual direction rather than rebuilding common app behavior.
 
 ## Important before release
 
