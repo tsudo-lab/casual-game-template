@@ -1,10 +1,10 @@
 # Modules
 
-This directory is the reserved home for reusable casual-game capabilities.
+このDirectoryは、Casual Gameで再利用できる機能を将来的に整理する場所です。
 
-Do not create empty implementations for every planned feature. Add a module only when a real game needs it.
+予定している機能を埋めるためだけに、空実装は作りません。**実際のゲームで必要になった時だけModuleを追加します。**
 
-Planned grouping:
+想定している分類:
 
 ```text
 core/
@@ -24,12 +24,16 @@ liveops/
   notifications
 ```
 
-Existing shared code can remain in `src/services/` and `src/storage/` until moving it here makes the codebase clearer rather than merely matching a diagram.
+現在の共通コードは、`src/services/` や `src/storage/` に置いたままで問題ありません。
 
-The module strategy is:
+図に合わせるためだけに移動するのではなく、Moduleとして整理した方がコードが分かりやすくなる段階で移します。
+
+基本ルール:
 
 ```text
-first real use → implement in this template/game
-repeated use   → organize under modules
-cross-template reuse → consider extracting a shared package/repository
+最初に必要になった      → そのGame / Template内で実装
+同じ利用が繰り返された  → modules配下へ整理
+複数Templateで共通利用   → Shared Package / Repository化を検討
 ```
+
+現時点ではModule専用Repositoryは作りません。
