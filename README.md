@@ -31,8 +31,8 @@ tsudo-lab
 3. docs/BUILD_PLAN.md に実装タスクを分割する
 4. このTemplateから新しいゲーム用Repositoryを作る
 5. CodexにBUILD_PLANのTask単位で実装を依頼する
-6. PRごとにレビュー・修正する
-7. 実機確認してリリースする
+6. PRごとにCI・レビュー・修正する
+7. 端末別QAと実機確認をしてリリースする
 8. 本当に共通化できる改善だけTemplateへ戻す
 ```
 
@@ -40,7 +40,7 @@ tsudo-lab
 
 - **ChatGPT Chat**: 企画、仕様、優先順位、ゲームとしての判断
 - **Codex**: 実装、テスト、技術的な修正、PR作成
-- **GitHub**: 確定した仕様、実装計画、コード、PRの置き場
+- **GitHub**: 確定した仕様、実装計画、コード、PR、CIの置き場
 - **Template**: 新作を始めるための初期基盤
 
 詳細は `docs/DEVELOPMENT_WORKFLOW.md` を参照してください。
@@ -72,6 +72,41 @@ assets/                     # ゲーム固有素材
 ```
 
 `HomeScreen.tsx` と `GameScreen.tsx` は共通Controllerです。デザイン変更のために、保存・広告・Share・画面遷移・Retryなどの処理を `src/design/` 側へ移さないことを基本ルールとします。
+
+## 端末別Layout / QA
+
+`Small screen / Large screen` のような大まかな分類だけで確認しません。
+
+標準Simulator / Emulator Matrixは以下です。
+
+```text
+iPhone SE (3rd generation)
+iPhone 16
+Pixel 8
+```
+
+この3端末を実際に起動して、Home / Tutorial / Game / Result / Settings / Safe Area / 日本語 / 英語 / Retryなどを確認します。
+
+Layoutは端末名をHardcodeして分岐するのではなく、実際の `width / height / safe area` を基準にResponsiveに調整します。
+
+```text
+検証単位 = 実際のDevice Profile
+Layout判断 = width / height / safe area
+```
+
+詳細は `docs/QA_CHECKLIST.md` を参照してください。
+
+## 自動Check
+
+Pull Requestと `main` へのPushではGitHub Actionsが以下を実行します。
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+```
+
+PRには `.github/pull_request_template.md` のチェックリストが自動で表示されます。
 
 ## モジュール方針
 
@@ -140,6 +175,10 @@ assets/
 ```text
 App.tsx
 AGENTS.md
+.github/
+├─ pull_request_template.md
+└─ workflows/
+   └─ ci.yml
 src/
 ├─ config/
 │  └─ game.ts
@@ -165,6 +204,7 @@ docs/
 ├─ DEVELOPMENT_WORKFLOW.md
 ├─ GAME_SPEC_TEMPLATE.md
 ├─ BUILD_PLAN_TEMPLATE.md
+├─ QA_CHECKLIST.md
 └─ ARCHITECTURE_ROADMAP.md
 ```
 
@@ -174,6 +214,7 @@ docs/
 - `docs/DEVELOPMENT_WORKFLOW.md`
 - `docs/GAME_SPEC_TEMPLATE.md`
 - `docs/BUILD_PLAN_TEMPLATE.md`
+- `docs/QA_CHECKLIST.md`
 
 を参照してください。
 
@@ -181,4 +222,4 @@ docs/
 
 ## リリース前
 
-Templateには汎用ID、サンプル広告設定、仮のPrivacy文言などが含まれます。Productionリリース前に必ず各ゲーム用へ置き換え、`install / typecheck / lint / test / 実機確認` を行ってください。
+Templateには汎用ID、サンプル広告設定、仮のPrivacy文言などが含まれます。Productionリリース前に必ず各ゲーム用へ置き換え、`typecheck / lint / test / 3端末QA / iOS・Android実機確認` を行ってください。
