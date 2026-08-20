@@ -1,10 +1,12 @@
-# Tsudo Lab game architecture roadmap
+# つどラボ ゲーム開発アーキテクチャ・ロードマップ
 
-This document separates **business/game lines**, **template repositories**, and **optional modules** so the codebase does not become over-generalized too early.
+このドキュメントでは、**事業 / ゲームのライン**、**Template Repository**、**Optional Module**を分けて整理します。
 
-## 1. Tsudo Lab game lines
+目的は、将来を考えすぎて今のコードを過度に抽象化しないことです。
 
-Tsudo Lab can explore three broad development lines without forcing them onto one technical foundation.
+## 1. つどラボの開発ライン
+
+つどラボでは、技術基盤を無理に1つへ統一せず、大きく3つの開発ラインを想定します。
 
 ```text
 Tsudo Lab
@@ -15,49 +17,55 @@ Tsudo Lab
 
 ### Casual
 
-Short-session mobile games designed for rapid experimentation and frequent releases. This is the only line currently being standardized with a template.
+短時間で遊べるモバイルゲームを高速に試し、頻繁にリリースするラインです。
+
+現時点でTemplate化しているのはこのラインだけです。
 
 ### Pochi-style
 
-Long-running games built around repeated progression, economy, community, or persistent worlds. These should be developed as individual products first. Common infrastructure should be extracted only after repeated patterns actually emerge.
+育成、経済、コミュニティ、Persistent Worldなどを軸に、長期間遊んでもらうゲームです。
 
-### Steam / Switch / party-oriented
+まずは各ゲームを個別Productとして作ります。複数作品で同じ実装が繰り返されるようになってから共通化します。
 
-Games where the core appeal may be multiplayer, streaming, spectatorship, controllers, PC/console distribution, or stronger bespoke content. These should not be forced into the React Native mobile template family.
+### Steam / Switch / Party-oriented
+
+Multiplayer、配信映え、観戦、Controller、PC / Console配信などが重要になるゲームです。
+
+React NativeのMobile Casual Templateへ無理に合わせず、必要なEngineや構成をそのタイトルごとに選びます。
 
 ## 2. Template family
 
-Current implementation:
+現在あるのは以下だけです。
 
 ```text
-tsudo-lab-game-template
-└─ role: Casual Game Template
+casual-game-template
+└─ 役割: Casual Game Template
 ```
 
-Possible future repositories, created only when needed:
+将来、実際に必要になったら以下を作る可能性があります。
 
 ```text
 stage-game-template
 └─ stage select
-   stage unlock/progression
+   stage unlock / progression
    clear state
    next-stage flow
    stage records / stars
 
 party-game-template
 └─ player setup
-   room/round setup
-   prompts/turns
+   room / round setup
+   prompts / turns
    shared result flow
 ```
 
-Do not build either repository in advance merely for completeness.
+「将来必要そう」という理由だけでは作りません。
 
-## 3. Casual template phases
+## 3. Casual TemplateのPhase
 
-### Phase 1 — release fast
+### Phase 1 — まず出す
 
-Default for every new casual title.
+すべての新規Casual Gameの標準です。
 
 ```text
 core game
@@ -65,16 +73,18 @@ local best
 retry
 share
 ads
-settings/tutorial
+settings / tutorial
 ```
 
-Goal: determine whether the mechanic itself earns repeated play.
+目的は、追加機能ではなく**ゲームのコア自体が繰り返し遊ばれるか**を確認することです。
 
-### Phase 1.5 — measure
+### Phase 1.5 — 計測する
 
-Add comparable analytics across titles. The important question is not only “how many installs?” but “which games create replay and return behavior?”
+タイトル間で比較できるAnalyticsを追加します。
 
-Candidate shared events:
+見るべきものはInstall数だけではなく、「どのゲームがRetryや再訪を生むか」です。
+
+候補Event:
 
 ```text
 game_start
@@ -85,11 +95,11 @@ share
 ad_shown
 ```
 
-### Phase 2 — grow winners
+### Phase 2 — 当たったゲームだけ伸ばす
 
-Only titles with promising behavior receive optional network/growth features.
+行動データが良いタイトルだけ、Network / Growth機能を追加します。
 
-Candidate modules:
+候補Module:
 
 ```text
 leaderboard
@@ -97,15 +107,15 @@ dailyChallenge
 friendChallenge
 ```
 
-A backend such as Supabase may be introduced here when the feature actually needs persistence, identity, or server-side validation.
+永続化、匿名identity、score validationなどが必要になった段階で、Supabase等のBackendを導入します。
 
-No automatic Phase 3-5 exists. Heavy social/live-service systems are product decisions, not default maturity milestones.
+Casual Gameに自動的なPhase 3〜5はありません。重いSocial / Live Serviceは、そのProductに必要かどうかで判断します。
 
 ## 4. Module architecture
 
-Modules stay in the casual-template repository for now.
+Moduleは現時点ではCasual Template内に置きます。
 
-Destination grouping:
+将来の整理先:
 
 ```text
 src/modules/
@@ -128,36 +138,58 @@ src/modules/
 
 ### Core
 
-Features useful to most titles and appropriate to ship early.
+多くのタイトルで使い、早い段階から入れてよい機能です。
 
 ### Growth
 
-Optional features for titles that have demonstrated enough value to justify backend/product complexity.
+ゲームの価値が確認できた後に追加するOptional機能です。
 
-### Liveops
+### LiveOps
 
-Only add when a title genuinely requires ongoing operational control. These are not default casual-game features.
+継続的な運用コントロールが本当に必要なゲームだけに追加します。
 
-## 5. When to extract modules into another repository
+Casual Gameの標準機能ではありません。
 
-Do **not** create a separate modules repository now.
+## 5. Moduleを別Repositoryへ切り出す条件
 
-Consider a shared package/repository only when all of the following are true:
+**今は別Module Repositoryを作りません。**
 
-1. At least two template families or several active games need the same implementation.
-2. Copying changes between projects has become a real maintenance problem.
-3. The API is stable enough that versioning it saves more time than it costs.
+以下が揃った時だけShared Package / Repository化を検討します。
 
-At that point a structure such as `tsudo-lab-mobile-core` may make sense.
+1. 2つ以上のTemplate family、または複数のActive Gameで同じ実装を使っている
+2. Project間へ同じ修正をコピーすることが実際の保守問題になっている
+3. APIがある程度安定し、Version管理する方が楽になっている
 
-## 6. Architecture rule of thumb
+その段階では `tsudo-lab-mobile-core` のような構成が候補になります。
 
-Optimize for the current product, not hypothetical reuse.
+## 6. 共通化の判断ルール
+
+仮説上の再利用ではなく、今あるProductを優先します。
 
 ```text
-first occurrence  → implement locally
-repeated pattern  → organize as a module
-cross-template repeated pattern → consider package extraction
+初回登場                  → まずそのGame / Template内で実装
+同じPatternが繰り返された  → Moduleとして整理
+複数Templateで繰り返された → Shared Package化を検討
 ```
 
-This keeps the Casual line fast while leaving room for Stage, Party, Pochi, and Steam/console development to evolve independently.
+これによりCasualラインの速度を落とさず、Stage、Party、Pochi、Steam / Consoleをそれぞれ独立して育てられます。
+
+## 7. 開発フローとの関係
+
+Templateはコードだけを配るものではなく、**開発の始め方も揃える**ために使います。
+
+新しいCasual Gameでは、基本的に以下を用意します。
+
+```text
+AGENTS.md
+
+docs/
+├─ GAME_SPEC.md
+└─ BUILD_PLAN.md
+```
+
+- `AGENTS.md` = Codexが毎回守る開発ルール
+- `GAME_SPEC.md` = 何を作るか
+- `BUILD_PLAN.md` = どの順番で実装するか
+
+企画・仕様はChatGPT Chatで詰め、実装はCodexへTask単位で渡し、確定内容はGitHubへ残す運用を標準とします。
