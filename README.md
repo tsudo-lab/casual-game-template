@@ -1,72 +1,92 @@
 # Tsudo Lab Casual Game Template
 
-This repository is the reusable **casual-game foundation** for Tsudo Lab mobile titles.
+つどラボの**短時間で遊べるモバイルカジュアルゲーム向け共通テンプレート**です。
 
-The purpose is to reuse app infrastructure while keeping each game's mechanic and visual identity free. PON, a 2048-style score game, a timing game, a physics game, or a simple puzzle can all use the same base even when their screens look completely different.
+目的は、アプリ基盤を使い回しながら、各タイトルでは**ゲームのルールと見た目に集中すること**です。PONのような物理ゲーム、2048系のスコアゲーム、タイミングゲーム、スワイプゲーム、軽いパズルなど、画面デザインがまったく違うゲームでも同じ基盤を利用できます。
 
-> Repository name remains `tsudo-lab-game-template` for now. Conceptually this is the **Casual Game Template**.
+## 現在の位置づけ
 
-## Current scope
+現時点で管理するテンプレートは、この **Casual Game Template だけ**です。
 
-For now, Tsudo Lab maintains **only this Casual Game Template**.
+Stage / Party 用テンプレートは先に作りません。実際のゲームでアプリの流れが大きく異なり、共通化する価値が出た時点で作ります。
 
-Do not create Stage / Party templates in advance. Create them only after a real game needs a substantially different application flow.
-
-Future template family:
+将来の想定は以下です。
 
 ```text
 tsudo-lab
-├─ casual-game-template      # NOW: short-session solo casual / score attack
-├─ stage-game-template       # FUTURE: stage select / clear / progression
-└─ party-game-template       # FUTURE: lightweight mobile party games
+├─ casual-game-template      # 現在: 短時間・1人用・スコアアタック中心
+├─ stage-game-template       # 将来: ステージ選択 / クリア / 進行管理
+└─ party-game-template       # 将来: 軽量なモバイルパーティゲーム
 ```
 
-Steam / Switch party titles and long-running Pochi-style games are outside this React Native template family and should be developed independently until repeated common patterns actually appear.
+ポチゲー系の長期運営ゲームや Steam / Switch 向けタイトルは、この React Native テンプレート群に無理に含めず、別ラインとして個別開発します。
 
-See `docs/ARCHITECTURE_ROADMAP.md` for the longer-term structure.
+詳しくは `docs/ARCHITECTURE_ROADMAP.md` を参照してください。
 
-## Shared by default
-
-The shared layer owns behavior, not art direction:
-
-- navigation
-- best-score persistence
-- one-time tutorial state
-- retry flow
-- result sharing as an image
-- haptics setting
-- Japanese / English setting
-- settings / privacy behavior
-- AdMob initialization / UMP hook
-- interstitial cadence after completed runs
-- Web / Expo Go ad-safe fallback
-
-## Freely replaceable per game
+## 新しいゲームを作る標準フロー
 
 ```text
-src/design/HomeVisual.tsx   # entire home-screen presentation
-src/design/GameVisual.tsx   # HUD, tutorial/result UI, share card
-src/game/GameView.tsx       # actual interactive game
-src/ui/theme.ts             # game-specific visual tokens when useful
-assets/                     # game-specific art/assets
+1. ChatGPT Chatで企画・仕様を固める
+2. docs/GAME_SPEC.md を作る
+3. docs/BUILD_PLAN.md に実装タスクを分割する
+4. このTemplateから新しいゲーム用Repositoryを作る
+5. CodexにBUILD_PLANのTask単位で実装を依頼する
+6. PRごとにレビュー・修正する
+7. 実機確認してリリースする
+8. 本当に共通化できる改善だけTemplateへ戻す
 ```
 
-`HomeScreen.tsx` and `GameScreen.tsx` are controllers. They load/save data and expose actions to visual components. A redesign should normally change `src/design/` without moving persistence, ads, sharing, navigation, or retry logic into the design layer.
+役割分担の基本は次の通りです。
 
-## Module strategy
+- **ChatGPT Chat**: 企画、仕様、優先順位、ゲームとしての判断
+- **Codex**: 実装、テスト、技術的な修正、PR作成
+- **GitHub**: 確定した仕様、実装計画、コード、PRの置き場
+- **Template**: 新作を始めるための初期基盤
 
-Modules are **not separate repositories right now**.
+詳細は `docs/DEVELOPMENT_WORKFLOW.md` を参照してください。
 
-The intended structure is:
+## 共通化しているもの
+
+共通層は**見た目ではなく振る舞い**を担当します。
+
+- 画面遷移
+- ローカルBEST保存
+- 初回チュートリアル状態
+- Retryフロー
+- 結果画像のShare
+- Haptics設定
+- 日本語 / 英語設定
+- Settings / Privacyの基本動作
+- AdMob初期化 / UMP連携ポイント
+- 規定回数プレイ後のインタースティシャル広告
+- Web / Expo Goで広告処理を安全にスキップするフォールバック
+
+## ゲームごとに自由に変える場所
+
+```text
+src/design/HomeVisual.tsx   # ホーム画面全体の見た目
+src/design/GameVisual.tsx   # HUD / Tutorial / Result / Share Card
+src/game/GameView.tsx       # 実際のゲーム部分
+src/ui/theme.ts             # 必要ならゲーム固有の色・余白など
+assets/                     # ゲーム固有素材
+```
+
+`HomeScreen.tsx` と `GameScreen.tsx` は共通Controllerです。デザイン変更のために、保存・広告・Share・画面遷移・Retryなどの処理を `src/design/` 側へ移さないことを基本ルールとします。
+
+## モジュール方針
+
+モジュールは**今は別Repositoryにしません**。
+
+将来的な整理先は次の通りです。
 
 ```text
 src/modules/
-├─ core/       # used by most casual games
-├─ growth/     # add only to games worth growing
-└─ liveops/    # add only when ongoing operation becomes necessary
+├─ core/       # 多くのカジュアルゲームで使う機能
+├─ growth/     # 伸びたゲームだけ追加する機能
+└─ liveops/    # 継続運営が必要になった時だけ追加する機能
 ```
 
-Conceptually:
+想定している機能は以下です。
 
 ```text
 core/
@@ -86,30 +106,26 @@ liveops/
   notifications
 ```
 
-Do not add empty implementations just to match this diagram. Existing shared code may remain in `services/` and `storage/` until a real refactor is useful. The module boundary is documented now so future functionality has a clear home.
+この図を埋めるためだけに空実装は作りません。現在の共通コードは `services/` や `storage/` に置いたままで問題ありません。実際に整理するメリットが出た時点で `modules/` に寄せます。
 
-If the same module is eventually shared by multiple template repositories, only then consider extracting a package/repository such as `tsudo-lab-mobile-core`.
+複数のテンプレートで同じ実装を本当に共有するようになったら、その時点で `tsudo-lab-mobile-core` のような共通package / repository化を検討します。
 
-## Product phases
-
-The casual-game line should stay lightweight:
+## Casual GameのPhase
 
 ```text
-Phase 1   Release fast
+Phase 1   まず出す
           game + local best + retry + share + ads
 
-Phase 1.5 Measure
+Phase 1.5 計測する
           analytics / replay / retention / share behavior
 
-Phase 2   Grow winners only
-          leaderboard / daily challenge / friend challenge as needed
+Phase 2   当たったゲームだけ伸ばす
+          leaderboard / daily challenge / friend challenge
 ```
 
-There is no default Phase 3-5 feature stack. Profiles, social graphs, real-time multiplayer, seasons, and heavy live operations should be added only when a specific successful title clearly needs them.
+Phase 3〜5を最初から想定しません。プロフィール、フォロー、リアルタイム対戦、シーズン、重いLiveOpsなどは、そのゲームに本当に必要になった時だけ追加します。
 
-## Game-specific surface
-
-Most new-game work should stay in:
+## 新作で主に変更する場所
 
 ```text
 src/config/game.ts
@@ -119,10 +135,11 @@ src/ui/theme.ts
 assets/
 ```
 
-## Current structure
+## 現在の構成
 
 ```text
 App.tsx
+AGENTS.md
 src/
 ├─ config/
 │  └─ game.ts
@@ -142,17 +159,26 @@ src/
 │  └─ README.md
 └─ ui/
    └─ theme.ts
+
+docs/
+├─ HOW_TO_CREATE_NEW_GAME.md
+├─ DEVELOPMENT_WORKFLOW.md
+├─ GAME_SPEC_TEMPLATE.md
+├─ BUILD_PLAN_TEMPLATE.md
+└─ ARCHITECTURE_ROADMAP.md
 ```
 
-## Creating a new game
-
-See:
+## 新しいゲームを作る時
 
 - `docs/HOW_TO_CREATE_NEW_GAME.md`
-- `docs/ARCHITECTURE_ROADMAP.md`
+- `docs/DEVELOPMENT_WORKFLOW.md`
+- `docs/GAME_SPEC_TEMPLATE.md`
+- `docs/BUILD_PLAN_TEMPLATE.md`
 
-The included game and visual components are intentionally simple placeholders. Replace the mechanic and art direction rather than rebuilding the common app behavior.
+を参照してください。
 
-## Before release
+テンプレート内のゲームとデザインは、あえて簡単なPlaceholderにしています。共通基盤を作り直すのではなく、ゲーム部分と見た目を差し替えて使います。
 
-The template intentionally contains generic identifiers, test/sample ad configuration, and placeholder privacy copy. Every production title must replace those and pass install / typecheck / lint / test / real-device checks.
+## リリース前
+
+Templateには汎用ID、サンプル広告設定、仮のPrivacy文言などが含まれます。Productionリリース前に必ず各ゲーム用へ置き換え、`install / typecheck / lint / test / 実機確認` を行ってください。
