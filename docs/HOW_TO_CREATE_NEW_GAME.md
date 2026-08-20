@@ -1,10 +1,26 @@
-# How to create a new Tsudo Lab game
+# How to create a new Tsudo Lab casual game
 
-The goal of this repository is to make the app shell reusable so each release mainly changes the **game rule and visual design**.
+This repository is the current **Casual Game Template**. Its job is to make short-session mobile games fast to build while keeping each title's mechanic and visual identity independent.
 
-## 1. Copy the template
+## 1. Decide whether this template fits
 
-Create a new repository from this codebase, then change the app identifiers in `app.json`.
+Use this template when the app is roughly:
+
+```text
+Home
+→ Play
+→ score / progress during one run
+→ result
+→ retry / share
+```
+
+Good fits include score attack, 2048-style casual puzzle, timing, reflex, physics, merge, swipe, and other short-session solo games.
+
+Do not force a game into this template if it fundamentally needs stage select/progression or a party-game setup flow. Those may become separate templates later when a real title requires them.
+
+## 2. Copy the template
+
+Create a new repository from this codebase, then change app identifiers in `app.json`.
 
 At minimum update:
 
@@ -13,30 +29,19 @@ At minimum update:
 - `expo.scheme`
 - `ios.bundleIdentifier`
 - `android.package`
-- AdMob app IDs before production
+- production AdMob configuration before release
 
-## 2. Change the game metadata
+## 3. Change game metadata
 
-Edit `src/config/game.ts`.
+Edit `src/config/game.ts` and set the game id, title, subtitle, tutorial copy, score label, and share message.
 
-Set:
-
-- game id
-- title
-- one-line subtitle
-- one-line tutorial
-- score label
-- share message
-
-Keep the tutorial short enough that a first-time player can understand the whole game in a few seconds.
-
-## 3. Replace the actual game
+## 4. Replace the actual game
 
 The main mechanics replacement point is:
 
 `src/game/GameView.tsx`
 
-The common controller passes these props:
+The common controller passes a small contract:
 
 ```ts
 interface GameViewProps {
@@ -48,82 +53,93 @@ interface GameViewProps {
 }
 ```
 
-Rules:
+Keep game-specific state and logic under `src/game/`. Report score changes and run completion to the controller rather than moving persistence, ads, sharing, or navigation into the game implementation.
 
-- keep game-specific state and logic under `src/game/`
-- call `onScoreChange` whenever the displayed score changes
-- call `onRunEnd` exactly once when a run ends
-- use `runId` to reset game state after retry
-- do not move common score persistence, retry, sharing, ads or navigation into the game
+## 5. Design the title freely
 
-For a larger game, split `src/game/` into `engine.ts`, `GameView.tsx`, components, and tests.
+The template separates behavior from presentation.
 
-## 4. Design the title freely
+Primary visual replacement points:
 
-The template deliberately separates **behavior from presentation**.
+- `src/design/HomeVisual.tsx` — entire home-screen composition
+- `src/design/GameVisual.tsx` — HUD, result/tutorial UI, share-card look
+- `src/game/GameView.tsx` — interactive stage itself
+- `src/ui/theme.ts` — optional title-specific tokens
+- `assets/` — title-specific visuals
 
-Use these files as the primary visual replacement points:
+The new game does not need to resemble any other Tsudo Lab title.
 
-- `src/design/HomeVisual.tsx` — entire home-screen layout and art direction
-- `src/design/GameVisual.tsx` — play-screen frame/HUD, tutorial, result UI and share-card look
-- `src/game/GameView.tsx` — the interactive stage itself
-- `src/ui/theme.ts` — optional shared colors/tokens for that title
+## 6. Phase 1 is the default
 
-You may completely replace the JSX and styles in `HomeVisual.tsx` and `GameVisual.tsx`. The new title does **not** need to resemble the template or other Tsudo Lab games.
+Every new casual game starts lightweight:
 
-Keep these behavioral contracts intact:
+```text
+Phase 1
+- game
+- local best score
+- retry
+- share
+- ads
+- settings/tutorial
+```
 
-- `HomeVisual` must still expose Play and Settings actions
-- `GameVisual` must still expose Home, tutorial-close, Share and Retry actions
-- the hidden share-card ref must remain available somewhere in `GameVisual` if image sharing is used
-- game mechanics still report score/run-end through `GameView`
+The purpose is to release quickly and determine whether the core loop is worth growing.
 
-The controller files under `src/screens/` should normally need no design edits.
+## 7. Phase 1.5: measure before adding features
 
-Example: for PON, `HomeVisual` could be a white full-screen scene with floating glossy balls and no visible card structure, while another game could use typography, illustrations or a completely different composition. Both still use the same navigation, storage and ad behavior.
+Analytics should eventually provide comparable signals across titles, such as game start/end, retry, score, share, play frequency, and retention-related behavior.
 
-## 5. What is already common
+Do not judge a title only by installs. A smaller game with strong replay may be a better Phase 2 candidate than a larger game people open once.
 
-The template already includes:
+## 8. Phase 2: grow winners only
 
-- Home controller
-- Game-session controller
-- Best-score persistence
-- One-time tutorial state
-- Retry flow
-- Share-card image generation behavior
-- Haptics setting
-- Japanese / English setting
-- Settings screen
-- Privacy screen placeholder
-- AdMob initialization and interstitial flow
-- Three-completed-runs ad cadence
-- Web / Expo Go safe ad fallback
+Only successful titles should receive optional growth features such as:
 
-## 6. Before production
+- leaderboard
+- daily challenge / common seed
+- friend-record challenge
 
-Do not ship the template identifiers or privacy text.
+These belong conceptually under `src/modules/growth/` and may use services such as Supabase when needed.
 
-Replace test/sample configuration with the new game's production configuration, then verify:
+Do not automatically add profiles, follower systems, seasons, real-time multiplayer, or other heavy live-service features to casual games.
 
-- iOS / Android identifiers
-- icons and splash assets
-- production AdMob app IDs and interstitial IDs
-- UMP message
-- privacy policy URL and in-app copy
-- store privacy / data-safety answers
-- app-ads.txt relationship
-- real-device ad cadence
-- sharing on real devices
-- safe-area layouts on small and large devices
+## 9. Module policy
 
-## Recommended weekly workflow
+Modules stay inside this repository for now. Do not create a separate modules repository prematurely.
 
-For the 3-releases-per-week strategy, aim to spend almost all game-specific work in:
+Planned conceptual groups:
 
-1. `src/config/game.ts`
-2. `src/game/`
-3. `src/design/`
-4. title-specific assets / `src/ui/theme.ts`
+```text
+src/modules/
+├─ core/
+│  ├─ ads
+│  ├─ analytics
+│  ├─ share
+│  └─ settings
+├─ growth/
+│  ├─ leaderboard
+│  ├─ dailyChallenge
+│  └─ friendChallenge
+└─ liveops/
+   ├─ remoteConfig
+   ├─ events
+   └─ notifications
+```
 
-If a new game repeatedly requires edits to controller, storage, service or navigation files, consider whether that feature belongs in the shared template instead.
+This is a destination architecture, not a requirement to create empty code. Extract shared packages only after multiple templates genuinely reuse the same implementation.
+
+## 10. Future template family
+
+Do not build these now, but keep the boundary clear:
+
+```text
+tsudo-lab-game-template      = Casual Game Template (current)
+future stage-game-template   = stage select / clear / progression
+future party-game-template   = lightweight mobile party games
+```
+
+Long-running Pochi-style games and Steam / Switch titles are separate development lines rather than extensions of this React Native casual template.
+
+## Before production
+
+Verify identifiers, assets, production ads/consent, privacy/data-safety declarations, sharing, safe areas, typecheck/lint/tests, and real-device behavior before shipping.
