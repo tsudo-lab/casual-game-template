@@ -21,6 +21,7 @@ interface HomeVisualProps {
 export function HomeVisual({ language, bestScore, onPlay, onSettings }: HomeVisualProps) {
   const { width } = useWindowDimensions();
   const copy = COMMON_COPY[language];
+  const heroCopy = GAME_META.tutorialSlides[language][0]?.body ?? GAME_META.subtitle[language];
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -39,7 +40,7 @@ export function HomeVisual({ language, bestScore, onPlay, onSettings }: HomeVisu
 
           <View style={styles.hero}>
             <Text style={styles.heroMark}>●</Text>
-            <Text style={styles.heroCopy}>{GAME_META.howTo[language]}</Text>
+            <Text style={styles.heroCopy}>{heroCopy}</Text>
           </View>
 
           <View style={styles.footer}>
