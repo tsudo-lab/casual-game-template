@@ -14,7 +14,9 @@ interface Props {
 
 export function TutorialCarousel({ backLabel, nextLabel, playLabel, slides, onComplete }: Props) {
   const [page, setPage] = useState(0);
-  const safeSlides = slides.length > 0 ? slides : [{ title: 'HOW TO PLAY', body: '' }];
+  const safeSlides: readonly TutorialSlide[] = slides.length > 0
+    ? slides
+    : [{ title: 'HOW TO PLAY', body: '' }];
   const slide = safeSlides[Math.min(page, safeSlides.length - 1)];
   const lastPage = page === safeSlides.length - 1;
 
