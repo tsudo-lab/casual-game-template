@@ -174,6 +174,7 @@ export function GameScreen({ language, hapticsEnabled, onHome }: Props) {
       onRetry={restart}
       gameContent={(
         <GameView
+          key={runId}
           runId={runId}
           hapticsEnabled={hapticsEnabled}
           language={language}
