@@ -40,16 +40,15 @@ Home
 - Score / BESTの定義
 - Result画面で見せる内容
 - Shareする内容
+- Tutorialで何ページに分けて何を説明するか
 - MVPで入れる機能 / 入れない機能
 - 見た目の方向性
 
-`docs/GAME_SPEC_TEMPLATE.md` をコピーして、新しいゲーム側に `docs/GAME_SPEC.md` として置く想定です。
+`docs/GAME_SPEC_TEMPLATE.md` をコピーして、新しいゲーム側に `docs/GAME_SPEC.md` として置きます。
 
 ## 3. 実装タスクへ分解する
 
-仕様が固まったら、`docs/BUILD_PLAN_TEMPLATE.md` を元に `docs/BUILD_PLAN.md` を作ります。
-
-1つの巨大タスクにせず、Codexへ渡しやすい単位に分けます。
+`docs/BUILD_PLAN_TEMPLATE.md` を元に `docs/BUILD_PLAN.md` を作ります。
 
 例:
 
@@ -61,34 +60,100 @@ Task 4: Share / haptics / common integration
 Task 5: QA / release preparation
 ```
 
-原則として、1つのTaskで関係ない領域をまとめて変更しません。
+1つのTaskで関係ない領域をまとめて変更しません。
 
 ## 4. Templateから新しいRepositoryを作る
 
 GitHubの **Use this template** から、新しいゲーム用Repositoryを作ります。
 
-その後、`app.json` の識別子を各ゲーム用へ変更します。
+その後、最低限以下を変更します。
 
-最低限確認するもの:
+### app.json
 
 - `expo.name`
 - `expo.slug`
 - `expo.scheme`
 - `ios.bundleIdentifier`
 - `android.package`
-- Productionリリース前のAdMob設定
+- AdMob iOS / Android App ID
 
-## 5. ゲーム固有情報を変更する
+### eas.json
 
-`src/config/game.ts` を編集し、ゲームID、タイトル、サブタイトル、Tutorial文言、Scoreラベル、Share文言などを設定します。
+- Production iOS Interstitial ID
+- Production Android Interstitial ID
+- 必要ならEAS project情報
+
+### src/config/game.ts
+
+- `GAME_META.id`
+- `GAME_META.title`
+- subtitle
+- tutorial slides
+- score label
+- share message
+- share URL
+
+### assets
+
+- App icon
+- Splash
+- Game assets
+
+## 5. 共通Behaviorは基本的に残す
+
+Template側ですでに共通化しているBehavior:
+
+```text
+Local BEST
+Initial tutorial state
+Tutorial carousel
+Tutorial reopen via ?
+Retry
+Game exit confirmation
+Android Back
+Share image + text + URL
+Haptics setting
+Language setting
+Settings / Privacy
+AdMob / UMP
+Interstitial cadence
+EAS profiles
+Release config check
+```
+
+ゲーム固有の理由がない限り、これらをGame側へ再実装しません。
+
+### Game途中の離脱
+
+共通Flow:
+
+```text
+Homeへ戻る
+最初からやり直す
+ゲームを続ける
+```
+
+Android BackもGame中は同じ確認Flowへ接続されます。
+
+### Tutorial
+
+`GAME_META.tutorialSlides` の内容だけゲーム固有化します。
+
+```ts
+{
+  eyebrow: 'STEP 1',
+  title: '最初の操作',
+  body: 'プレイヤーが最初に知る必要がある内容',
+}
+```
+
+初回自動表示、ページ送り、`?` からの再表示、表示中のGame入力Blockは共通Behaviorです。
 
 ## 6. 実際のゲームを置き換える
 
-ゲーム本体の主な差し替えポイントは以下です。
+ゲーム本体の主な差し替えポイントは `src/game/GameView.tsx` です。
 
-`src/game/GameView.tsx`
-
-共通Controllerとの契約は小さく保ちます。
+共通Controllerとの基本契約:
 
 ```ts
 interface GameViewProps {
@@ -100,25 +165,61 @@ interface GameViewProps {
 }
 ```
 
-ゲーム固有のstate / logicは `src/game/` に置きます。
-
-Score変化とRun終了だけ共通Controllerへ通知し、保存・広告・Share・Navigationなどの共通処理をゲーム本体へ持ち込まないことを基本とします。
+- Score変化 → `onScoreChange`
+- Run終了 → `onRunEnd` を1回
+- Retry Reset → `runId`
+- High Score保存はGame側へ重複実装しない
+- Ad表示をGame側へ直接書かない
+- NavigationをGame Engineへ持ち込まない
 
 ## 7. デザインはゲームごとに自由に作る
 
-Templateは、BehaviorとPresentationを分離しています。
+主な差し替え場所:
 
-主な見た目の差し替え場所:
+- `src/design/HomeVisual.tsx` — Home
+- `src/design/GameVisual.tsx` — HUD / Tutorial / Exit / Result / Share Card
+- `src/design/TutorialCarousel.tsx` — 共通Carouselの見た目を変えたい場合
+- `src/game/GameView.tsx` — Game Area
+- `src/ui/theme.ts` — Color / Space等
+- `assets/` — Game固有素材
 
-- `src/design/HomeVisual.tsx` — Home画面全体
-- `src/design/GameVisual.tsx` — HUD / Tutorial / Result / Share Card
-- `src/game/GameView.tsx` — 実際のゲーム領域
-- `src/ui/theme.ts` — 必要に応じたゲーム固有token
-- `assets/` — ゲーム固有の画像等
+Behaviorは共通でも、見た目を他作品へ寄せる必要はありません。
 
-新しいゲームは、他のつどラボ作品と似た見た目にする必要はありません。
+## 8. Shareを設定する
 
-## 8. CodexにはTask単位で依頼する
+`GAME_META` で設定します。
+
+```ts
+shareUrl: 'https://example.com/your-game',
+shareMessage: {
+  ja: (score) => `...${score}...`,
+  en: (score) => `...${score}...`,
+},
+```
+
+NativeではResult画像 + Message + URLをShare Sheetへ渡します。
+
+Release前にiOS / Android実機で共有先を確認してください。
+
+## 9. AdMob / UMP
+
+Development / Preview:
+
+```text
+Test Ads = true
+Consent debug geography = EEA
+```
+
+Production:
+
+```text
+Test Ads = false
+Consent debug geography = DISABLED
+```
+
+`react-native-google-mobile-ads` はTemplateで既知動作versionへ固定しています。Versionを更新する場合はiOS / Pixel 8のnative buildを確認してからTemplateへ戻します。
+
+## 10. CodexにはTask単位で依頼する
 
 基本は `docs/GAME_SPEC.md` と `docs/BUILD_PLAN.md` を読ませて、Task単位で実装を依頼します。
 
@@ -132,11 +233,52 @@ Homeや広告には触らないでください。
 完了したら変更点と未確認事項をまとめてください。
 ```
 
-最初から「ゲームを全部完成させて」と依頼するより、PRごとに範囲を絞ります。
+## 11. Local QA
 
-## 9. Phase 1を標準とする
+起動方法:
 
-すべての新規カジュアルゲームは、まず軽量なPhase 1から始めます。
+- `docs/LOCAL_DEVICE_TESTING.md`
+
+確認項目:
+
+- `docs/QA_CHECKLIST.md`
+
+標準端末:
+
+```text
+iPhone SE (3rd generation)
+iPhone 16
+Pixel 8
+```
+
+UIは端末名Hardcodeではなく `width / height / safe area` でResponsiveに調整します。
+
+通常の自動Check:
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+```
+
+## 12. Release準備
+
+`docs/RELEASE_CHECKLIST_TEMPLATE.md` をコピーしてゲーム側の `docs/RELEASE_CHECKLIST.md` にします。
+
+Store用:
+
+- `docs/STORE_LISTING_TEMPLATE.md`
+- `docs/STORE_PRIVACY_TEMPLATE.md`
+
+Production提出前:
+
+```bash
+npm run release:check
+```
+
+Template初期状態ではProduction用IDがPlaceholderなので失敗します。各ゲーム固有のBundle ID / Package / AdMob ID / EAS Production設定へ置き換えた後に成功させてください。
+
+## 13. Phase 1を標準とする
 
 ```text
 Phase 1
@@ -148,11 +290,11 @@ Phase 1
 - settings / tutorial
 ```
 
-目的は、機能を増やすことではなく、コアゲームが繰り返し遊ばれるかを早く確認することです。
+目的は機能を増やすことではなく、コアゲームが繰り返し遊ばれるかを早く確認することです。
 
-## 10. Phase 1.5で計測する
+## 14. Phase 1.5で計測する
 
-必要になったらAnalyticsを追加し、各ゲームで比較できる指標を取ります。
+必要になったらAnalyticsを追加します。
 
 候補:
 
@@ -163,27 +305,19 @@ Phase 1
 - play frequency
 - retentionに関係する行動
 
-Install数だけで勝ち負けを決めません。Installが少なくてもRetryや再訪が強いゲームは、Phase 2候補になり得ます。
-
-## 11. Phase 2は当たったゲームだけ
-
-伸びたゲームにだけ、必要に応じてGrowth機能を追加します。
-
-例:
+## 15. Phase 2は当たったゲームだけ
 
 - leaderboard
 - daily challenge / same seed
 - friend-record challenge
 
-これらは概念上 `src/modules/growth/` に置きます。永続化、匿名identity、score validationなどが必要になれば、その段階でSupabase等のBackendを検討します。
+永続化、匿名identity、score validationなどが必要になれば、その段階でSupabase等のBackendを検討します。
 
 プロフィール、フォロー、シーズン、リアルタイム対戦などを標準機能として追加しません。
 
-## 12. モジュール方針
+## 16. Module方針
 
-現時点では、Module用の別Repositoryは作りません。
-
-将来的な整理先:
+現時点ではModule用の別Repositoryは作りません。
 
 ```text
 src/modules/
@@ -202,54 +336,15 @@ src/modules/
    └─ notifications
 ```
 
-これは将来の整理先であり、空実装を作るための設計図ではありません。
+実際に同じPatternが複数タイトルで繰り返されてから整理します。
 
-複数のTemplateで本当に同じ実装を使うようになってから、共通Package / Repositoryへの切り出しを検討します。
+## 17. Templateへ戻す
 
-## 13. 将来のTemplate
-
-今は作りませんが、境界だけは明確にしておきます。
+新作で共通改善が見つかったら、まずGame側で完成させます。
 
 ```text
-casual-game-template      = 現在の短時間カジュアル向け
-stage-game-template       = 将来のStage選択 / Clear / Progression向け
-party-game-template       = 将来の軽量Mobile Party向け
+Game固有 → Game側に残す
+複数Gameでそのまま使える → TemplateへBackport
 ```
 
-ポチゲー系長期運営ゲームやSteam / Switch向けタイトルは、Casual Templateの拡張ではなく別の開発ラインとして扱います。
-
-## 14. ゲーム開発中にTemplateへ戻すもの
-
-新しいゲームを作っていて、複数タイトルでもそのまま使える改善が見つかった場合だけTemplateへ戻します。
-
-```text
-ゲーム固有の処理 → そのゲームに残す
-複数ゲームで共通になる処理 → Templateへ戻す候補
-```
-
-例:
-
-- PON固有のBall physics → PON側
-- Share画像生成の共通改善 → Template側
-- 広告制御の共通Bug修正 → Template側
-
-Templateは「すべてを抽象化する場所」ではなく、「新作を作るたびに本当に共通だったものだけ学習する基盤」として扱います。
-
-## リリース前
-
-以下を確認してください。
-
-- iOS / Android identifiers
-- icon / splash / assets
-- Production AdMob IDs
-- UMP / consent
-- Privacy Policy
-- Store privacy / Data Safety
-- Share実機確認
-- Safe Area
-- `npm install`
-- `npm run typecheck`
-- `npm run lint`
-- `npm test`
-- iOS実機
-- Android実機
+今回のように、実際のゲームで有効だったNavigation / Tutorial / Test / Release patternをTemplateへ戻して育てます。
