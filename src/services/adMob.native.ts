@@ -11,6 +11,11 @@ type InterstitialLike = {
 
 const isSupportedRuntime = Constants.appOwnership !== 'expo';
 const forceTestAds = process.env.EXPO_PUBLIC_ADMOB_FORCE_TEST_ADS !== 'false';
+const forceEeaConsentDebug = process.env.EXPO_PUBLIC_ADMOB_CONSENT_DEBUG_GEOGRAPHY === 'EEA';
+const consentTestDeviceIdentifiers = (process.env.EXPO_PUBLIC_ADMOB_CONSENT_TEST_DEVICE_IDS ?? '')
+  .split(',')
+  .map((identifier) => identifier.trim())
+  .filter(Boolean);
 
 class AdMobService {
   private interstitial: InterstitialLike | null = null;
@@ -24,8 +29,30 @@ class AdMobService {
     if (!isSupportedRuntime || this.initialized) return this.initialized;
 
     try {
-      const { AdsConsent, AdsConsentPrivacyOptionsRequirementStatus, default: mobileAds } = await import('react-native-google-mobile-ads');
-      const consentInfo = await AdsConsent.gatherConsent({ tagForUnderAgeOfConsent: false }).catch(() => AdsConsent.getConsentInfo().catch(() => null));
+      const {
+        AdsConsent,
+        AdsConsentDebugGeography,
+        AdsConsentPrivacyOptionsRequirementStatus,
+        default: mobileAds,
+      } = await import('react-native-google-mobile-ads');
+
+      let consentInfo;
+      try {
+        consentInfo = await AdsConsent.gatherConsent({
+          tagForUnderAgeOfConsent: false,
+          ...(forceEeaConsentDebug
+            ? {
+                debugGeography: AdsConsentDebugGeography.EEA,
+                ...(consentTestDeviceIdentifiers.length > 0
+                  ? { testDeviceIdentifiers: consentTestDeviceIdentifiers }
+                  : {}),
+              }
+            : {}),
+        });
+      } catch {
+        // A previous valid consent state may still permit ads when refresh fails offline.
+        consentInfo = await AdsConsent.getConsentInfo().catch(() => null);
+      }
 
       this.privacyOptionsRequired = consentInfo?.privacyOptionsRequirementStatus === AdsConsentPrivacyOptionsRequirementStatus.REQUIRED;
       if (!consentInfo?.canRequestAds) return false;
