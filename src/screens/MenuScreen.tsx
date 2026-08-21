@@ -64,11 +64,6 @@ export function SettingsScreen({ language, hapticsEnabled, showAdPrivacy, onBack
         </View>
       </View>
 
-      <View style={styles.guide}>
-        <Text style={styles.guideLabel}>{copy.howTo}</Text>
-        <Text style={styles.guideText}>{GAME_META.howTo[language]}</Text>
-      </View>
-
       <Pressable style={styles.link} onPress={onPrivacy}><Text style={styles.rowLabel}>{copy.privacy}</Text><Text style={styles.chevron}>›</Text></Pressable>
       {showAdPrivacy ? <Pressable style={styles.link} onPress={onAdPrivacy}><Text style={styles.rowLabel}>Ad privacy</Text><Text style={styles.chevron}>›</Text></Pressable> : null}
     </Frame>
@@ -113,9 +108,6 @@ const styles = StyleSheet.create({
   segmentActive: { backgroundColor: palette.ink },
   segmentText: { color: palette.muted, fontSize: 11, fontWeight: '800' },
   segmentTextActive: { color: palette.white },
-  guide: { padding: 18, borderRadius: 18, backgroundColor: palette.stage },
-  guideLabel: { color: palette.muted, fontSize: 9, fontWeight: '900', letterSpacing: 1 },
-  guideText: { marginTop: 8, color: palette.ink, fontSize: 15, lineHeight: 22, fontWeight: '700' },
   link: { minHeight: 60, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 16, borderWidth: 1, borderColor: palette.faint, backgroundColor: palette.white },
   chevron: { color: palette.muted, fontSize: 26 },
   privacyCard: { padding: 20, borderRadius: 18, borderWidth: 1, borderColor: palette.faint, backgroundColor: palette.white },
