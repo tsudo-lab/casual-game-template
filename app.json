@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Tsudo Lab Game",
+    "slug": "tsudo-lab-game",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "scheme": "tsudolabgame",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.tsudolab.game.template",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.tsudolab.game.template",
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511",
+          "delayAppMeasurementInit": true
+        }
+      ]
+    ]
+  }
+}
