@@ -103,10 +103,10 @@ export function GameVisual({
               <View style={styles.exitCard}>
                 <Text style={styles.exitTitle}>{copy.exit.title}</Text>
                 <Text style={styles.exitDescription}>{copy.exit.description}</Text>
-                <Pressable style={styles.primaryButton} onPress={onConfirmHome} accessibilityRole="button">
+                <Pressable style={styles.exitPrimaryButton} onPress={onConfirmHome} accessibilityRole="button">
                   <Text style={styles.primaryText}>{copy.exit.home}</Text>
                 </Pressable>
-                <Pressable style={[styles.secondaryButton, styles.exitButtonSpacing]} onPress={onRestartFromExit} accessibilityRole="button">
+                <Pressable style={styles.exitSecondaryButton} onPress={onRestartFromExit} accessibilityRole="button">
                   <Text style={styles.secondaryText}>{copy.exit.restart}</Text>
                 </Pressable>
                 <Pressable style={styles.resumeButton} onPress={onResumeGame} accessibilityRole="button">
@@ -164,7 +164,8 @@ const styles = StyleSheet.create({
   exitCard: { width: '100%', maxWidth: 340, padding: 24, borderRadius: 24, backgroundColor: palette.card },
   exitTitle: { color: palette.ink, textAlign: 'center', fontSize: 24, lineHeight: 30, fontWeight: '900' },
   exitDescription: { marginTop: 8, marginBottom: 20, color: palette.muted, textAlign: 'center', fontSize: 13, lineHeight: 20, fontWeight: '700' },
-  exitButtonSpacing: { marginTop: 10 },
+  exitPrimaryButton: { minHeight: 52, paddingHorizontal: 20, borderRadius: 26, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.accent },
+  exitSecondaryButton: { minHeight: 52, marginTop: 10, borderRadius: 26, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: palette.faint, backgroundColor: palette.white },
   resumeButton: { minHeight: 46, marginTop: 8, alignItems: 'center', justifyContent: 'center' },
   resumeText: { color: palette.accent, fontSize: 14, fontWeight: '900' },
   overlayEyebrow: { color: palette.accent, fontSize: 11, fontWeight: '900', letterSpacing: 1.4 },
