@@ -65,7 +65,7 @@ export function GameScreen({ language, hapticsEnabled, onHome }: Props) {
     setRunId((value) => value + 1);
   }, []);
 
-  const restart = async () => {
+  const restart = useCallback(async () => {
     if (isRestarting) return;
     setIsRestarting(true);
     try {
@@ -77,7 +77,7 @@ export function GameScreen({ language, hapticsEnabled, onHome }: Props) {
     } finally {
       setIsRestarting(false);
     }
-  };
+  }, [isRestarting, resetRun]);
 
   const closeTutorial = useCallback(() => {
     setTutorial('hidden');
@@ -104,7 +104,7 @@ export function GameScreen({ language, hapticsEnabled, onHome }: Props) {
       return;
     }
     resetRun();
-  }, [resetRun, result]);
+  }, [resetRun, restart, result]);
 
   useEffect(() => {
     if (Platform.OS !== 'android') return;
