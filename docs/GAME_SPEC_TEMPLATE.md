@@ -12,15 +12,13 @@
 
 8〜20文字程度で説明できる一文。
 
-例:
-
 ```text
-同じ色の玉をぶつけて進化させる
+
 ```
 
 ## 2. プレイヤーがやること
 
-プレイヤーの基本操作を1〜3個に絞る。
+基本操作を1〜3個に絞る。
 
 ```text
 - 
@@ -169,6 +167,25 @@ Share Cardに入れるもの:
 - 
 - 
 
+Share message:
+
+```text
+JA:
+EN:
+```
+
+Share URL:
+
+```text
+https://
+```
+
+Template標準は **Result画像 + Message + URL**。変更する理由がある場合:
+
+```text
+
+```
+
 Challenge Link / Replay等はMVPで必要か:
 
 ```text
@@ -177,19 +194,54 @@ Challenge Link / Replay等はMVPで必要か:
 
 ## 13. Tutorial
 
-最初の数秒で理解させる内容:
+Template標準は、初回Playで自動表示する複数ページCarousel + Game中 `?` からの再表示です。
+
+何ページにするか:
 
 ```text
 
 ```
 
-Tutorial文言:
+各ページ:
 
 ```text
+STEP 1
+- eyebrow:
+- title:
+- body:
 
+STEP 2
+- eyebrow:
+- title:
+- body:
+
+STEP 3
+- eyebrow:
+- title:
+- body:
 ```
 
-## 14. 操作感 / Juice
+初見ユーザーがTutorialだけで最初の成功状態まで進めるかを確認する。
+
+## 14. Game途中の離脱
+
+Template標準:
+
+```text
+Homeへ戻る
+最初からやり直す
+ゲームを続ける
+```
+
+Android BackもGame中は同じ確認Flowへ接続する。
+
+このゲームで標準を変える必要があるか:
+
+```text
+不要 / 必要（理由: ）
+```
+
+## 15. 操作感 / Juice
 
 必要なFeedback:
 
@@ -207,7 +259,7 @@ MVPで優先するもの:
 
 ```
 
-## 15. Visual Direction
+## 16. Visual Direction
 
 ### 雰囲気
 
@@ -235,16 +287,19 @@ MVPで優先するもの:
 
 参考作品のMechanicsやArtworkをそのままコピーするのではなく、参考にするProduct Qualityを言語化する。
 
-## 16. Phase 1 MVP
+## 17. Phase 1 MVP
 
 ### 入れる
 
 - Game
 - Local BEST
 - Retry
-- Share
-- Ads
-- Settings / Tutorial
+- Result image + text + URL Share
+- Ads / UMP
+- Settings
+- Tutorial carousel / reopen
+- Game exit confirmation
+- Android Back
 - 
 
 ### 入れない
@@ -256,7 +311,7 @@ MVPで優先するもの:
 - Backend
 - 
 
-## 17. Analytics（Phase 1.5候補）
+## 18. Analytics（Phase 1.5候補）
 
 ```text
 - game_start
@@ -267,7 +322,7 @@ MVPで優先するもの:
 - 
 ```
 
-## 18. Phase 2候補
+## 19. Phase 2候補
 
 コアが当たった場合だけ検討するもの:
 
@@ -278,7 +333,7 @@ MVPで優先するもの:
 - その他:
 ```
 
-## 19. 未決事項
+## 20. 未決事項
 
 実装開始前に決める必要があること:
 
@@ -290,16 +345,22 @@ MVPで優先するもの:
 - [ ] 
 - [ ] 
 
-## 20. MVP完成条件
-
-この状態になったら「まず出せる」と判断する条件:
+## 21. MVP完成条件
 
 - [ ] Core Loopが成立している
 - [ ] Start → Play → Result → Retryが通る
 - [ ] BESTが保存される
-- [ ] Shareが動く
+- [ ] 初回Tutorialが自動表示される
+- [ ] `?` からTutorialを再表示できる
+- [ ] Game途中のHome / Restart / Continueが動く
+- [ ] Pixel 8でAndroid Backが正しく動く
+- [ ] Share画像 + Message + URLが動く
 - [ ] Adsが想定Cadenceで動く
-- [ ] Tutorialで初見Playできる
+- [ ] Offline / 広告失敗でGameが止まらない
 - [ ] Typecheck / Lint / Testが通る
-- [ ] iOS実機で確認した
-- [ ] Android実機で確認した
+- [ ] iPhone SE (3rd generation)確認
+- [ ] iPhone 16確認
+- [ ] Pixel 8確認
+- [ ] iOS実機でShare / Haptics / Ads / UMP確認
+- [ ] Android実機でShare / Haptics / Ads / UMP確認
+- [ ] Production前に `npm run release:check` が通る
