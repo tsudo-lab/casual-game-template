@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   scoreValue: { color: palette.ink, fontSize: 21, fontWeight: '900', fontVariant: ['tabular-nums'] },
   bestValue: { color: palette.muted, fontSize: 8, fontWeight: '800' },
   gameArea: { flex: 1 },
-  overlay: { ...StyleSheet.absoluteFillObject, zIndex: 10, alignItems: 'center', justifyContent: 'center', padding: 26, backgroundColor: 'rgba(47,42,37,0.38)' },
+  overlay: { ...StyleSheet.absoluteFill, zIndex: 10, alignItems: 'center', justifyContent: 'center', padding: 26, backgroundColor: 'rgba(47,42,37,0.38)' },
   resultCard: { width: '100%', padding: 24, borderRadius: 24, alignItems: 'center', backgroundColor: palette.card },
   exitCard: { width: '100%', maxWidth: 340, padding: 24, borderRadius: 24, backgroundColor: palette.card },
   exitTitle: { color: palette.ink, textAlign: 'center', fontSize: 24, lineHeight: 30, fontWeight: '900' },
