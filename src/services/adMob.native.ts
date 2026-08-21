@@ -14,7 +14,7 @@ const forceTestAds = process.env.EXPO_PUBLIC_ADMOB_FORCE_TEST_ADS !== 'false';
 const forceEeaConsentDebug = process.env.EXPO_PUBLIC_ADMOB_CONSENT_DEBUG_GEOGRAPHY === 'EEA';
 const consentTestDeviceIdentifiers = (process.env.EXPO_PUBLIC_ADMOB_CONSENT_TEST_DEVICE_IDS ?? '')
   .split(',')
-  .map((identifier) => identifier.trim())
+  .map((identifier: string) => identifier.trim())
   .filter(Boolean);
 
 class AdMobService {
