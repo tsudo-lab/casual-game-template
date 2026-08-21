@@ -16,6 +16,8 @@ Codexには原則としてTask単位で依頼します。
 - [ ] 未決事項のうち、実装を止めるものが解消されている
 - [ ] Game名 / app identifiersの方針が決まっている
 - [ ] MVPで「入れない機能」が明確になっている
+- [ ] Share URLの方針が決まっている
+- [ ] Tutorialのページ構成が決まっている
 
 ## Task 1 — Game Engine / Core Mechanics
 
@@ -92,14 +94,16 @@ src/game/
 目的:
 
 ```text
-そのGame固有のHome / HUD / Tutorial / Resultを作る。
+そのGame固有のHome / HUD / Tutorial / Exit / Resultを作る。
 ```
 
 実装:
 
 - [ ] HomeVisual
 - [ ] GameVisual / HUD
-- [ ] Tutorial
+- [ ] Tutorial carouselの見た目
+- [ ] `?` Tutorial入口
+- [ ] Game exit confirmationの見た目
 - [ ] Result
 - [ ] Share Card
 - [ ] Theme / Assets
@@ -118,11 +122,14 @@ assets/
 - TemplateのPlaceholder Designへ寄せる必要はない
 - 端末名をHardcodeしてLayout分岐しない
 - 必要な調整は `width / height / safe area` を基準にResponsiveに行う
+- Tutorial / ExitのBehaviorはController側の共通Flowを利用する
 
 完了条件:
 
 - [ ] HomeからPlayが分かる
 - [ ] Play中に必要な情報だけ見える
+- [ ] Tutorialがページ単位で理解できる
+- [ ] Exit確認の3択が分かる
 - [ ] Resultが一目で理解できる
 - [ ] Share Cardだけ見ても結果が伝わる
 
@@ -138,19 +145,26 @@ Templateの共通機能とGameを接続する。
 
 - [ ] Local BEST
 - [ ] Retry
-- [ ] Share
+- [ ] Result画像 + Message + URL Share
 - [ ] Tutorial persistence
+- [ ] Tutorial reopen via `?`
+- [ ] Game exit confirmation
+- [ ] Android Back
 - [ ] Haptics setting
 - [ ] Language
 - [ ] Ads / cadence
+- [ ] UMP consent debug
 - [ ] Privacy / Settings導線
 
 完了条件:
 
 - [ ] App再起動後もBESTが残る
 - [ ] Retryで新しいRunが始まる
-- [ ] Shareが実機で動く
+- [ ] Home / Restart / Continueの離脱Flowが動く
+- [ ] Pixel 8のBackがGame / Settings / Privacyで正しく動く
+- [ ] Share画像 + 文章 + URLが実機で動く
 - [ ] Adsが想定通り動く
+- [ ] Offline / 広告失敗でもGameが止まらない
 
 ## Task 5 — QA / Polish
 
@@ -160,7 +174,7 @@ Templateの共通機能とGameを接続する。
 リリース前に壊れや違和感を減らす。
 ```
 
-`Small screen / Large screen` のような曖昧な確認ではなく、標準Device Matrixを実際に起動して確認します。
+起動手順は `docs/LOCAL_DEVICE_TESTING.md`、確認項目は `docs/QA_CHECKLIST.md` を使います。
 
 ### Simulator / Emulator
 
@@ -171,8 +185,10 @@ Templateの共通機能とGameを接続する。
 ### 各端末で確認
 
 - [ ] Home
-- [ ] Tutorial
+- [ ] 初回Tutorial
+- [ ] Tutorial再表示
 - [ ] Game
+- [ ] Game exit confirmation
 - [ ] Result
 - [ ] Settings / Privacy
 - [ ] Safe Area
@@ -185,14 +201,16 @@ Templateの共通機能とGameを接続する。
 - [ ] 日本語
 - [ ] 英語
 - [ ] Haptics ON / OFF
+- [ ] Pixel 8 Android Back
 - [ ] Performance
 
-### Share / Ads
+### Share / Ads / UMP
 
 - [ ] Share cancel / success
+- [ ] Share画像 + Message + URL
 - [ ] Adsあり / fallback
-
-詳細は `docs/QA_CHECKLIST.md` を使います。
+- [ ] UMP EEA debug
+- [ ] Offline
 
 Check:
 
@@ -208,6 +226,8 @@ npm test
 
 ## Task 6 — Release Preparation
 
+`docs/RELEASE_CHECKLIST_TEMPLATE.md` をゲーム側の `docs/RELEASE_CHECKLIST.md` にコピーして使用します。
+
 - [ ] `expo.name`
 - [ ] `expo.slug`
 - [ ] `expo.scheme`
@@ -215,15 +235,29 @@ npm test
 - [ ] `android.package`
 - [ ] icon
 - [ ] splash
-- [ ] Production AdMob IDs
-- [ ] UMP / Consent
+- [ ] Production AdMob App IDs
+- [ ] Production Interstitial IDs
+- [ ] Production Test Ads disabled
+- [ ] Production UMP debug disabled
+- [ ] UMP / Consent message
 - [ ] Privacy Policy
 - [ ] Store privacy / Data Safety
 - [ ] app-ads.txt関連
 - [ ] Store screenshots
 - [ ] Store copy
+- [ ] `docs/STORE_LISTING_TEMPLATE.md` を埋めた
+- [ ] `docs/STORE_PRIVACY_TEMPLATE.md` を埋めた
 - [ ] iOS実機確認
 - [ ] Android実機確認
+- [ ] Internal testing
+
+Production gate:
+
+```bash
+npm run release:check
+```
+
+- [ ] release:check pass
 
 ## Phase 1.5 — Analytics（必要になったら）
 
@@ -248,8 +282,6 @@ MVP時点では実装しない。
 
 ## Backlog / 今回やらない
 
-ここには、実装中に気づいたが現在のTaskへ混ぜないものを書く。
-
 - [ ] 
 - [ ] 
 - [ ] 
@@ -259,15 +291,3 @@ MVP時点では実装しない。
 このGame固有ではなく、他のCasual Gameでもそのまま使えそうな改善だけ記録する。
 
 - [ ] 
-- [ ] 
-
-## Codexへの依頼例
-
-```text
-AGENTS.md、docs/GAME_SPEC.md、docs/BUILD_PLAN.mdを読んでください。
-今回はTask 1だけ実装してください。
-Task 1と無関係なUI、Ads、Settingsには変更を広げないでください。
-必要なUnit Testを追加し、typecheck / lint / testを実行してください。
-実行できなかったCheckは未実行と明記してください。
-完了時に、実装内容・主な変更File・Test結果・未確認事項・別Task候補をまとめてください。
-```
