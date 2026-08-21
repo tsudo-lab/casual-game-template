@@ -26,11 +26,15 @@ Task:
 - [ ] `npm run lint`
 - [ ] `npm test`
 
+Production設定へ触れたPRでは追加で:
+
+- [ ] `npm run release:check`
+
 未実行のものがある場合は理由を書いてください。
 
 ## Simulator / Emulator確認
 
-このPRでUI / GameView / Layoutへ変更がある場合は確認してください。
+UI / GameView / Layout / Navigationへ変更がある場合は `docs/LOCAL_DEVICE_TESTING.md` に沿って確認してください。
 
 - [ ] iPhone SE (3rd generation)
 - [ ] iPhone 16
@@ -42,18 +46,25 @@ Task:
 端末確認不要の理由:
 ```
 
-## UI確認
+## UI / Flow確認
 
 該当する項目だけ確認してください。
 
 - [ ] Safe Area
 - [ ] 日本語
 - [ ] 英語
-- [ ] Tutorial
+- [ ] 初回Tutorial
+- [ ] `?` からTutorial再表示
+- [ ] Tutorial中のGame入力Block
 - [ ] Game
+- [ ] Game途中のHome離脱確認
+- [ ] Exit: Homeへ戻る
+- [ ] Exit: 最初からやり直す
+- [ ] Exit: ゲームを続ける
+- [ ] Android Back
 - [ ] Result
 - [ ] Retry
-- [ ] Share
+- [ ] Share画像 + 文章 + URL
 - [ ] Settings / Privacy
 
 ## 実機確認
@@ -65,6 +76,7 @@ Task:
 - [ ] Haptics
 - [ ] Share Sheet
 - [ ] Ads / UMP
+- [ ] Offline / 広告失敗Fallback
 
 ## 未確認事項
 
