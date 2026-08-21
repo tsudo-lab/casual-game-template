@@ -1,3 +1,5 @@
+import { describe, expect, it } from '@jest/globals';
+
 import { COMMON_COPY, GAME_META } from '../game';
 
 describe('common game configuration', () => {
