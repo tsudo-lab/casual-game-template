@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 
@@ -12,14 +12,10 @@ import { palette } from '../ui/theme';
  * - keep all game-specific state and rules inside src/game/
  * - report live score through onScoreChange
  * - call onRunEnd once when the run finishes
+ * - the common controller remounts GameView when runId changes
  */
-export function GameView({ runId, hapticsEnabled, onScoreChange, onRunEnd }: GameViewProps) {
+export function GameView({ hapticsEnabled, onScoreChange, onRunEnd }: GameViewProps) {
   const [score, setScore] = useState(0);
-
-  useEffect(() => {
-    setScore(0);
-    onScoreChange(0);
-  }, [runId, onScoreChange]);
 
   const tap = () => {
     const next = score + 1;
