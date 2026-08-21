@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert } from 'react-native';
+import { Alert, BackHandler, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -23,6 +23,19 @@ export default function App() {
     void loadHapticsEnabled().then(setHapticsEnabled);
     void adMobService.initialize().then(() => setAdPrivacyRequired(adMobService.isPrivacyOptionsRequired()));
   }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (screen === 'home') return false;
+      if (screen === 'game') return false; // GameScreen owns in-run back behavior.
+      setScreen(screen === 'privacy' ? 'settings' : 'home');
+      return true;
+    });
+
+    return () => subscription.remove();
+  }, [screen]);
 
   const changeLanguage = (next: AppLanguage) => {
     setLanguage(next);
