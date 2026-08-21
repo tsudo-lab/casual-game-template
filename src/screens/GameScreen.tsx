@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform, Share, View } from 'react-native';
+import { BackHandler, Platform, Share, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import * as Sharing from 'expo-sharing';
+import NativeShare from 'react-native-share';
 import { captureRef } from 'react-native-view-shot';
 
 import { AppLanguage, GAME_META } from '../config/game';
@@ -24,8 +24,9 @@ type TutorialState = 'loading' | 'visible' | 'hidden';
 /**
  * Common play-session controller.
  *
- * Keep persistence, ads, retry, sharing and tutorial lifecycle here. Visual
- * layout belongs in design/GameVisual.tsx and game mechanics in game/GameView.tsx.
+ * Keep persistence, ads, retry, sharing, tutorial lifecycle and exit behavior
+ * here. Visual layout belongs in design/GameVisual.tsx and game mechanics in
+ * game/GameView.tsx.
  */
 export function GameScreen({ language, hapticsEnabled, onHome }: Props) {
   const [runId, setRunId] = useState(0);
@@ -36,6 +37,7 @@ export function GameScreen({ language, hapticsEnabled, onHome }: Props) {
   const [isRestarting, setIsRestarting] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [tutorial, setTutorial] = useState<TutorialState>('loading');
+  const [exitConfirmVisible, setExitConfirmVisible] = useState(false);
   const shareCardRef = useRef<View>(null);
 
   useEffect(() => {
@@ -56,6 +58,13 @@ export function GameScreen({ language, hapticsEnabled, onHome }: Props) {
     });
   }, [best?.score, hapticsEnabled]);
 
+  const resetRun = useCallback(() => {
+    setScore(0);
+    setResult(null);
+    setIsNewBest(false);
+    setRunId((value) => value + 1);
+  }, []);
+
   const restart = async () => {
     if (isRestarting) return;
     setIsRestarting(true);
@@ -64,34 +73,83 @@ export function GameScreen({ language, hapticsEnabled, onHome }: Props) {
         const shown = await adMobService.showInterstitialIfReady();
         if (shown) await markInterstitialShown();
       }
-      setScore(0);
-      setResult(null);
-      setIsNewBest(false);
-      setRunId((value) => value + 1);
+      resetRun();
     } finally {
       setIsRestarting(false);
     }
   };
 
+  const closeTutorial = useCallback(() => {
+    setTutorial('hidden');
+    void markTutorialSeen();
+  }, []);
+
+  const requestHome = useCallback(() => {
+    if (result) {
+      onHome();
+      return;
+    }
+    setExitConfirmVisible(true);
+  }, [onHome, result]);
+
+  const confirmHome = useCallback(() => {
+    setExitConfirmVisible(false);
+    onHome();
+  }, [onHome]);
+
+  const restartFromExit = useCallback(() => {
+    setExitConfirmVisible(false);
+    if (result) {
+      void restart();
+      return;
+    }
+    resetRun();
+  }, [resetRun, result]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (tutorial === 'visible') {
+        closeTutorial();
+        return true;
+      }
+      if (exitConfirmVisible) {
+        setExitConfirmVisible(false);
+        return true;
+      }
+      if (result) {
+        onHome();
+        return true;
+      }
+      setExitConfirmVisible(true);
+      return true;
+    });
+
+    return () => subscription.remove();
+  }, [closeTutorial, exitConfirmVisible, onHome, result, tutorial]);
+
   const shareResult = async () => {
     if (!result || isSharing) return;
     setIsSharing(true);
+    const baseMessage = GAME_META.shareMessage[language](result.score);
+    const message = GAME_META.shareUrl ? `${baseMessage}\n\n${GAME_META.shareUrl}` : baseMessage;
     try {
-      const message = GAME_META.shareMessage[language](result.score);
-      if (Platform.OS !== 'web' && shareCardRef.current && await Sharing.isAvailableAsync()) {
+      if (Platform.OS !== 'web' && shareCardRef.current) {
         const uri = await captureRef(shareCardRef, { format: 'png', quality: 1, result: 'tmpfile' });
-        await Sharing.shareAsync(uri, { dialogTitle: GAME_META.title, mimeType: 'image/png', UTI: 'public.png' });
+        await NativeShare.open({
+          title: GAME_META.title,
+          message,
+          url: uri,
+          type: 'image/png',
+          failOnCancel: false,
+        });
       } else {
         await Share.share({ message, title: GAME_META.title });
       }
     } finally {
       setIsSharing(false);
     }
-  };
-
-  const closeTutorial = () => {
-    setTutorial('hidden');
-    void markTutorialSeen();
   };
 
   return (
@@ -104,8 +162,13 @@ export function GameScreen({ language, hapticsEnabled, onHome }: Props) {
       isSharing={isSharing}
       isRestarting={isRestarting}
       tutorialVisible={tutorial === 'visible'}
+      exitConfirmVisible={exitConfirmVisible}
       shareCardRef={shareCardRef}
-      onHome={onHome}
+      onRequestHome={requestHome}
+      onConfirmHome={confirmHome}
+      onRestartFromExit={restartFromExit}
+      onResumeGame={() => setExitConfirmVisible(false)}
+      onOpenTutorial={() => setTutorial('visible')}
       onCloseTutorial={closeTutorial}
       onShare={shareResult}
       onRetry={restart}
