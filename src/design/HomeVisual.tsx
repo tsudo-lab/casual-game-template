@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppLanguage, COMMON_COPY, GAME_META } from '../config/game';
+import { useResponsiveLayout } from '../ui/layout';
 import { layout, palette } from '../ui/theme';
 
 interface HomeVisualProps {
@@ -19,17 +20,17 @@ interface HomeVisualProps {
  * new game can redesign this file freely without touching navigation/storage.
  */
 export function HomeVisual({ language, bestScore, onPlay, onSettings }: HomeVisualProps) {
-  const { width } = useWindowDimensions();
+  const responsive = useResponsiveLayout();
   const copy = COMMON_COPY[language];
   const heroCopy = GAME_META.tutorialSlides[language][0]?.body ?? GAME_META.subtitle[language];
 
   return (
     <SafeAreaView style={styles.screen}>
-      <View style={[styles.shell, { width: Math.min(width, layout.maxWidth) }]}>
+      <View style={[styles.shell, { width: responsive.shellWidth, padding: responsive.shellPadding }]}>
         <View style={styles.card}>
           <View style={styles.header}>
             <View>
-              <Text style={styles.title}>{GAME_META.title}</Text>
+              <Text style={[styles.title, responsive.isTablet && styles.titleTablet]}>{GAME_META.title}</Text>
               <Text style={styles.subtitle}>{GAME_META.subtitle[language]}</Text>
             </View>
             <View style={styles.bestCard}>
@@ -39,7 +40,7 @@ export function HomeVisual({ language, bestScore, onPlay, onSettings }: HomeVisu
           </View>
 
           <View style={styles.hero}>
-            <Text style={styles.heroMark}>●</Text>
+            <Text style={[styles.heroMark, { fontSize: 128 * responsive.illustrationScale, lineHeight: 138 * responsive.illustrationScale }]}>●</Text>
             <Text style={styles.heroCopy}>{heroCopy}</Text>
           </View>
 
@@ -64,6 +65,7 @@ const styles = StyleSheet.create({
   card: { flex: 1, overflow: 'hidden', borderRadius: layout.radius, borderWidth: 1, borderColor: palette.faint, backgroundColor: palette.card },
   header: { height: 98, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   title: { color: palette.ink, fontSize: 30, lineHeight: 32, fontWeight: '900', letterSpacing: -1.2 },
+  titleTablet: { fontSize: 36, lineHeight: 39 },
   subtitle: { marginTop: 4, maxWidth: 220, color: palette.muted, fontSize: 10, fontWeight: '700' },
   bestCard: { minWidth: 92, paddingHorizontal: 12, paddingVertical: 9, borderRadius: 14, backgroundColor: palette.white, borderWidth: 1, borderColor: palette.faint, alignItems: 'center' },
   bestLabel: { color: palette.muted, fontSize: 8, fontWeight: '900', letterSpacing: 1 },

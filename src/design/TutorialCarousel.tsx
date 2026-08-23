@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { TutorialSlide } from '../config/game';
+import { useResponsiveLayout } from '../ui/layout';
 import { palette } from '../ui/theme';
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 
 export function TutorialCarousel({ backLabel, nextLabel, playLabel, slides, onComplete }: Props) {
   const [page, setPage] = useState(0);
+  const responsive = useResponsiveLayout();
   const safeSlides: readonly TutorialSlide[] = slides.length > 0
     ? slides
     : [{ title: 'HOW TO PLAY', body: '' }];
@@ -21,7 +23,7 @@ export function TutorialCarousel({ backLabel, nextLabel, playLabel, slides, onCo
   const lastPage = page === safeSlides.length - 1;
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { maxWidth: responsive.contentMaxWidth, minHeight: responsive.isTablet ? 440 : responsive.isCompact ? 350 : 390, padding: responsive.isTablet ? 30 : 24 }]}>
       <View style={styles.topRow}>
         <Text style={styles.howTo}>HOW TO PLAY</Text>
         <Text style={styles.pageCount}>{page + 1} / {safeSlides.length}</Text>

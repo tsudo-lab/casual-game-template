@@ -241,6 +241,12 @@ Template初期状態ではProduction IDがPlaceholderなので `release:check` �
 
 実行できないCheckを「実行済み」と書かないでください。
 
+### Game logic
+
+- ゲーム固有のルール・乱数・得点計算は、画面から分離した純粋な `engine` / `rules` に置きます。
+- 仕様変更時は、成功・失敗・境界条件・seed付き乱数・先読み表示との一致をユニットテストで確認します。
+- 詳細は `docs/GAME_LOGIC_TESTING.md` を参照してください。
+
 ## 12. 端末別Layout / QA
 
 標準確認端末:
@@ -307,3 +313,10 @@ Game固有 → Game側に残す
 ```
 
 実際のGameで有効性を確認してからTemplateへ戻します。
+
+## 17. Store build guard
+
+- Production buildとストア提出は、対象Productの最新 `develop` 上のリリース候補コミットからのみ行います。
+- 開始前に必ず `git branch --show-current`、`git status --short --branch`、`origin/develop` との差分を確認します。
+- `develop` 以外、未コミット変更あり、または対象コミットが `origin/develop` と異なる場合は停止し、差分と例外ビルドになることを報告します。ユーザーが明示的に許可するまでbuildしません。
+- EASの表示コミットだけでソースがcleanだったと判断しません。Production buildは必ずcleanな作業ツリーで実行します。
