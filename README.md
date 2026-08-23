@@ -38,6 +38,8 @@ tsudo-lab
 
 新しいゲームのコピー方法、初回モックの実装、ローカルサーバーの起動、コマンド結果の報告は [`docs/HOW_TO_CREATE_NEW_GAME.md`](docs/HOW_TO_CREATE_NEW_GAME.md) に定めます。
 
+新しいゲーム案をTemplate上で比較・検討するときも、3案の文章だけで終わらせません。コアルールや操作感の違いを確認するため、`casual-game-mock-<slug>` の独立コピーで最小のインタラクティブモックを作り、`npm run web` のURLを出して実際に触れるところまで進めます。
+
 役割分担の基本は次の通りです。
 
 - **casual-game-idea**: 企画、比較、ゲーム専用の開発プロンプト作成
