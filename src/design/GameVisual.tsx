@@ -1,9 +1,10 @@
 import { ReactNode, RefObject } from 'react';
-import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppLanguage, COMMON_COPY, GAME_META } from '../config/game';
 import { GameResult } from '../game/types';
+import { useResponsiveLayout } from '../ui/layout';
 import { layout, palette } from '../ui/theme';
 import { TutorialCarousel } from './TutorialCarousel';
 
@@ -57,14 +58,14 @@ export function GameVisual({
   onShare,
   onRetry,
 }: GameVisualProps) {
-  const { width } = useWindowDimensions();
+  const responsive = useResponsiveLayout();
   const copy = COMMON_COPY[language];
 
   return (
     <SafeAreaView style={styles.screen}>
-      <View style={[styles.shell, { width: Math.min(width, layout.maxWidth) }]}>
+      <View style={[styles.shell, { width: responsive.shellWidth, padding: responsive.shellPadding }]}>
         <View style={styles.card}>
-          <View style={styles.header}>
+          <View style={[styles.header, responsive.isTablet && styles.headerTablet]}>
             <Pressable style={styles.roundButton} onPress={onRequestHome} accessibilityRole="button" accessibilityLabel={copy.home}>
               <Text style={styles.homeText}>←</Text>
             </Pressable>
@@ -100,7 +101,7 @@ export function GameVisual({
 
           {exitConfirmVisible ? (
             <View style={styles.overlay}>
-              <View style={styles.exitCard}>
+              <View style={[styles.exitCard, { maxWidth: responsive.modalMaxWidth }]}>
                 <Text style={styles.exitTitle}>{copy.exit.title}</Text>
                 <Text style={styles.exitDescription}>{copy.exit.description}</Text>
                 <Pressable style={styles.exitPrimaryButton} onPress={onConfirmHome} accessibilityRole="button">
@@ -118,7 +119,7 @@ export function GameVisual({
 
           {result ? (
             <View style={styles.overlay}>
-              <View style={styles.resultCard}>
+              <View style={[styles.resultCard, { maxWidth: responsive.modalMaxWidth }]}>
                 <Text style={styles.overlayEyebrow}>{isNewBest ? copy.newBest : copy.gameOver}</Text>
                 <Text style={styles.resultScore}>{result.score.toLocaleString()}</Text>
                 {result.shareDetail ? <Text style={styles.detail}>{result.shareDetail}</Text> : null}
@@ -148,6 +149,7 @@ const styles = StyleSheet.create({
   shell: { flex: 1, padding: layout.side },
   card: { flex: 1, overflow: 'hidden', borderRadius: layout.radius, borderWidth: 1, borderColor: palette.faint, backgroundColor: palette.card },
   header: { minHeight: 94, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 8, borderBottomWidth: 1, borderBottomColor: palette.faint },
+  headerTablet: { minHeight: 112, paddingHorizontal: 18 },
   roundButton: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: palette.faint, backgroundColor: palette.white },
   homeText: { color: palette.ink, fontSize: 21, fontWeight: '800' },
   helpText: { color: palette.ink, fontSize: 18, fontWeight: '900' },

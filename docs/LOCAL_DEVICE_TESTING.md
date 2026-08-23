@@ -182,8 +182,11 @@ adb shell pm clear <ANDROID_PACKAGE>
 最低限、以下で確認します。
 
 - iPhone SE (3rd generation)
-- iPhone 16
+- iPhone 17
+- iPad 11-inch（縦持ち）
 - Pixel 8
+
+iPadは通常の縦持ちに加えて、1/2 Split View相当の狭い幅でも確認します。端末名で分岐させず、実際のwindow sizeとSafe AreaによってPhone layoutへ戻ることを確認してください。
 
 詳細な項目は `docs/QA_CHECKLIST.md` を使います。
 

@@ -6,19 +6,21 @@
 
 ## 標準Simulator / Emulator Matrix
 
-最低限、以下の3端末で確認します。
+最低限、以下の4端末で確認します。
 
 | Platform | Device | 主な役割 |
 |---|---|---|
 | iOS | iPhone SE (3rd generation) | 小さいiPhoneでの崩れ確認 |
-| iOS | iPhone 16 | 標準的な現行iPhoneでの確認 |
+| iOS | iPhone 17 | 標準的な現行iPhoneでの確認 |
+| iOS | iPad 11-inch（縦持ち） | iPadの余白・最大幅・Safe Area確認 |
 | Android | Pixel 8 | 標準Androidでの確認 |
 
 参考として、iOSのLayoutは以下のLogical Sizeを基準に確認できます。
 
 ```text
 iPhone SE (3rd generation): 375 x 667 pt
-iPhone 16:                  393 x 852 pt
+iPhone 17:                  実際のSimulator Window Sizeで確認
+iPad 11-inch（縦持ち）:    実際のSimulator Window Sizeで確認
 ```
 
 Pixel 8は物理Display SizeとReact Native上のLogical Sizeが異なるため、Raw Pixel値だけでLayout判断しません。Android Studioの `Pixel 8` Device Profileを使い、実際のWindow Size / Safe Areaで確認してください。
@@ -48,7 +50,7 @@ const { width, height } = useWindowDimensions();
 Layout判断 = width / height / safe area
 ```
 
-## 3端末すべてで確認する項目
+## 4端末すべてで確認する項目
 
 ### Home
 
@@ -157,12 +159,19 @@ Pixel 8で確認します。
 - [ ] Tutorial / Exit / Result Modalの高さ
 - [ ] Game Areaが小さくなりすぎない
 
-### iPhone 16
+### iPhone 17
 
 - [ ] 標準Designとして意図した見え方
 - [ ] Dynamic Island側のSafe Area
 - [ ] Home / Gameの余白Balance
 - [ ] Share Cardとの見た目差が大きすぎない
+
+### iPad 11-inch（縦持ち）
+
+- [ ] Game領域が横に広がりすぎず、中央で読みやすく収まる
+- [ ] Home / Tutorial / Result / Settingsが大きな余白に対して小さすぎない
+- [ ] 1/2 Split View相当の狭い幅では、Phone向けLayoutへ自然に戻る
+- [ ] Safe Areaと操作領域が干渉しない
 
 ### Pixel 8
 
@@ -189,7 +198,8 @@ Release前にはiOS / Androidそれぞれ最低1台の実機確認を行いま�
 
 ```text
 [ ] iPhone SE (3rd generation) 確認済み
-[ ] iPhone 16 確認済み
+[ ] iPhone 17 確認済み
+[ ] iPad 11-inch（縦持ち）確認済み
 [ ] Pixel 8 確認済み
 [ ] Tutorial / Exit / Android Back確認済み
 [ ] Share画像 + Text + URL確認済み

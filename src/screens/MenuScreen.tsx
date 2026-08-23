@@ -1,7 +1,8 @@
-import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppLanguage, COMMON_COPY, GAME_META } from '../config/game';
+import { useResponsiveLayout } from '../ui/layout';
 import { layout, palette } from '../ui/theme';
 
 interface FrameProps {
@@ -11,10 +12,10 @@ interface FrameProps {
 }
 
 function Frame({ title, onBack, children }: FrameProps) {
-  const { width } = useWindowDimensions();
+  const responsive = useResponsiveLayout();
   return (
     <SafeAreaView style={styles.screen}>
-      <View style={[styles.shell, { width: Math.min(width, layout.maxWidth) }]}>
+      <View style={[styles.shell, { width: responsive.shellWidth, padding: responsive.shellPadding }]}>
         <View style={styles.card}>
           <View style={styles.header}>
             <Pressable style={styles.backButton} onPress={onBack}><Text style={styles.backText}>←</Text></Pressable>
