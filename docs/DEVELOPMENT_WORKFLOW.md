@@ -110,17 +110,17 @@ Task 6  Release Preparation
 
 ## TemplateからRepositoryを作る
 
-GitHubの **Use this template** で新しいRepositoryを作ります。
+Template上で作業ブランチを切らず、Templateをローカルコピーして独立したゲームRepositoryを作ります。具体的なコピー手順、`.git`と生成物の除外、初期ブランチ、Remoteの扱いは [`HOW_TO_CREATE_NEW_GAME.md`](HOW_TO_CREATE_NEW_GAME.md) に従います。
 
 例:
 
 ```text
 casual-game-template
-        ↓
-      pon
+        ↓ コピー
+casual-game-<game-repo-name>
 ```
 
-新しいRepositoryはTemplateとは独立したProjectとして扱います。
+新しいRepositoryはTemplateとは独立したProjectとして扱います。GitHub Remoteの追加とPushは、明示的に依頼されるまで行いません。
 
 その後、最低限以下を変更します。
 
@@ -142,6 +142,8 @@ Scope外の変更は広げず、必要なら別Task候補として報告して�
 必要なTestを追加し、typecheck / lint / testを実行してください。
 実行できないものは未実行と明記してください。
 ```
+
+新しいゲームを最初に作るPromptでは、上記に加えて、コピー先の作成、`npm install`、最小のプレイ可能なモック、`npm run web` によるローカルサーバー起動、Homeから最初のプレイまでの確認、実行コマンドと結果の報告を同じ初回Taskの完了条件にします。計画だけ、またはコード変更だけで初回報告を終えません。
 
 Codexには毎回すべての背景を長文で再説明するより、Repository内のDocumentを読ませます。
 
@@ -320,7 +322,7 @@ GAME_SPEC.md
 ↓
 BUILD_PLAN.md
 ↓
-Use this template
+Templateをコピーして独立Repositoryを作成
 ↓
 Codex Task 1
 ↓

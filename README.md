@@ -27,13 +27,16 @@ tsudo-lab
 
 ```text
 1. casual-game-ideaで企画を固め、ゲーム専用の開発プロンプトを作る
-2. このTemplateをコピーして、新しいゲーム用の独立Repositoryを作る
+2. Template上でブランチを切らず、Templateをコピーして新しいゲーム用の独立Repositoryを作る
 3. 開発プロンプトを意図のソースとして、必要に応じてGAME_SPEC / BUILD_PLANへ実装内容を分ける
-4. Codexにゲーム側のTask単位で実装を依頼する
-5. PRごとにCI・レビュー・修正する
-6. 端末別QAと実機確認をしてリリースする
-7. 本当に複数ゲームで再利用できる改善だけTemplateへ戻す
+4. 最小のプレイ可能なモックを作り、typecheck / lint / testとローカル画面確認まで行う
+5. Codexにゲーム側のTask単位で実装を依頼する
+6. PRごとにCI・レビュー・修正する
+7. 端末別QAと実機確認をしてリリースする
+8. 本当に複数ゲームで再利用できる改善だけTemplateへ戻す
 ```
+
+新しいゲームのコピー方法、初回モックの実装、ローカルサーバーの起動、コマンド結果の報告は [`docs/HOW_TO_CREATE_NEW_GAME.md`](docs/HOW_TO_CREATE_NEW_GAME.md) に定めます。
 
 役割分担の基本は次の通りです。
 

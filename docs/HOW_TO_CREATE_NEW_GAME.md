@@ -64,7 +64,30 @@ Task 5: QA / release preparation
 
 ## 4. Templateから新しいRepositoryを作る
 
-GitHubの **Use this template** から、新しいゲーム用Repositoryを作ります。
+Template上で作業ブランチを切ったり、Templateをcloneして履歴を共有したりしません。現在のTemplateをローカルでコピーし、独立したゲームRepositoryとして作業します。
+
+コピー元のTemplateに未コミット変更がある場合は、まず状態を報告してから進めます。コピー先がすでに存在する場合は上書きしません。
+
+以下の `casual-game-example` は、実際のゲームRepository名へ置き換えます。特定タイトルの名前をこの共通手順へ固定しません。
+
+```bash
+git status --short --branch
+git remote -v
+pwd
+```
+
+Templateの親ディレクトリで、`.git`と生成物を除外してコピーします。
+
+```bash
+rsync -a --exclude='.git' --exclude='node_modules' --exclude='.expo' --exclude='dist' casual-game-template/ casual-game-example/
+cd casual-game-example
+git init -b main
+npm install
+git status --short --branch
+git remote -v
+```
+
+コピー先では、TemplateとGit履歴を共有しません。GitHub Remoteの追加、Push、Template側の変更は、明示的な依頼があるまで行いません。
 
 その後、最低限以下を変更します。
 
@@ -233,7 +256,37 @@ Homeや広告には触らないでください。
 完了したら変更点と未確認事項をまとめてください。
 ```
 
-## 11. Local QA
+## 11. 初回モックをローカルで確認する
+
+新しいゲームの初回実装依頼では、計画やコード変更の報告だけで止めず、最初のプレイ可能なモックをローカルで確認できるところまで進めます。
+
+まず、コピー先で以下を実行します。
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+```
+
+最小モックが起動できる状態になったら、ローカルWebサーバーを起動します。
+
+```bash
+npm run web
+```
+
+起動ログに表示されたURLを使って、少なくとも以下を確認します。
+
+- Homeが表示される
+- PlayからGame画面へ進める
+- ゲーム固有の最初の操作ができる
+- Resultまたはモックの完了状態まで到達できる
+- 画面が空白になっていない
+
+初回の報告には、実行したコマンド、各コマンドの成否、ローカルサーバーのURL、実際に確認できた画面、未確認の範囲を含めます。サーバー起動後の画面確認ができない環境では、サーバー起動と画面確認を分けて報告します。
+
+その後のSimulator / Emulator確認は、以下の標準手順を使います。
+
+## 12. Local QA
 
 起動方法:
 
@@ -261,7 +314,7 @@ npm run lint
 npm test
 ```
 
-## 12. Release準備
+## 13. Release準備
 
 `docs/RELEASE_CHECKLIST_TEMPLATE.md` をコピーしてゲーム側の `docs/RELEASE_CHECKLIST.md` にします。
 
@@ -278,7 +331,7 @@ npm run release:check
 
 Template初期状態ではProduction用IDがPlaceholderなので失敗します。各ゲーム固有のBundle ID / Package / AdMob ID / EAS Production設定へ置き換えた後に成功させてください。
 
-## 13. Phase 1を標準とする
+## 14. Phase 1を標準とする
 
 ```text
 Phase 1
@@ -292,7 +345,7 @@ Phase 1
 
 目的は機能を増やすことではなく、コアゲームが繰り返し遊ばれるかを早く確認することです。
 
-## 14. Phase 1.5で計測する
+## 15. Phase 1.5で計測する
 
 必要になったらAnalyticsを追加します。
 
@@ -305,7 +358,7 @@ Phase 1
 - play frequency
 - retentionに関係する行動
 
-## 15. Phase 2は当たったゲームだけ
+## 16. Phase 2は当たったゲームだけ
 
 - leaderboard
 - daily challenge / same seed
