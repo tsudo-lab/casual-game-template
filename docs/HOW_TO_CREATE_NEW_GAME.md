@@ -27,7 +27,7 @@ Home
 
 ステージ選択や進行管理が中心のゲーム、複数人のセットアップやターン進行が中心のパーティゲームなど、アプリの流れそのものが違う場合は無理にこのTemplateへ合わせません。
 
-## 2. まずChatGPT Chatで仕様を固める
+## 2. まずChatGPT Chatで案を比較し、必要ならすぐモックにする
 
 実装前に、ゲームとしての重要な判断を先に決めます。
 
@@ -45,6 +45,19 @@ Home
 - 見た目の方向性
 
 `docs/GAME_SPEC_TEMPLATE.md` をコピーして、新しいゲーム側に `docs/GAME_SPEC.md` として置きます。
+
+ただし、コアルール、操作、リスクと報酬、ゲームフィールの違いを検討している段階では、3案を文章だけで比較して終わらせません。文章比較は判断軸を整理するための短い前置きとし、最小のインタラクティブモックで実際の違いを確認します。
+
+### アイデア検討時の標準フロー
+
+1. 3案を短く比較し、各案のプレイヤー行動と検証したいリスクを明記する
+2. Templateを変更せず、`casual-game-mock-<slug>` の独立コピーを作る
+3. 同じ画面で案を切り替えられる比較モック、または推奨案の操作可能な縦切りを作る
+4. `npm run typecheck`、`npm run lint`、`npm test` を実行する
+5. `npm run web` を起動する
+6. 起動ログに出たURLを報告し、Homeから最初の操作・結果まで確認する
+
+初回の成果物は「3案の説明」ではなく、「3案の判断軸 + 触れるモック + ローカル確認URL」です。モックの技術的な起動成功と、プレイして面白かったという評価は分けて報告します。
 
 ## 3. 実装タスクへ分解する
 
@@ -64,7 +77,30 @@ Task 5: QA / release preparation
 
 ## 4. Templateから新しいRepositoryを作る
 
-GitHubの **Use this template** から、新しいゲーム用Repositoryを作ります。
+Template上で作業ブランチを切ったり、Templateをcloneして履歴を共有したりしません。現在のTemplateをローカルでコピーし、独立したゲームRepositoryとして作業します。
+
+コピー元のTemplateに未コミット変更がある場合は、まず状態を報告してから進めます。コピー先がすでに存在する場合は上書きしません。
+
+以下の `casual-game-example` は、実際のゲームRepository名へ置き換えます。特定タイトルの名前をこの共通手順へ固定しません。
+
+```bash
+git status --short --branch
+git remote -v
+pwd
+```
+
+Templateの親ディレクトリで、`.git`と生成物を除外してコピーします。
+
+```bash
+rsync -a --exclude='.git' --exclude='node_modules' --exclude='.expo' --exclude='dist' casual-game-template/ casual-game-example/
+cd casual-game-example
+git init -b main
+npm install
+git status --short --branch
+git remote -v
+```
+
+コピー先では、TemplateとGit履歴を共有しません。GitHub Remoteの追加、Push、Template側の変更は、明示的な依頼があるまで行いません。
 
 その後、最低限以下を変更します。
 
@@ -233,7 +269,37 @@ Homeや広告には触らないでください。
 完了したら変更点と未確認事項をまとめてください。
 ```
 
-## 11. Local QA
+## 11. 初回モックをローカルで確認する
+
+新しいゲームの初回実装依頼では、計画やコード変更の報告だけで止めず、最初のプレイ可能なモックをローカルで確認できるところまで進めます。
+
+まず、コピー先で以下を実行します。
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+```
+
+最小モックが起動できる状態になったら、ローカルWebサーバーを起動します。
+
+```bash
+npm run web
+```
+
+起動ログに表示されたURLを使って、少なくとも以下を確認します。
+
+- Homeが表示される
+- PlayからGame画面へ進める
+- ゲーム固有の最初の操作ができる
+- Resultまたはモックの完了状態まで到達できる
+- 画面が空白になっていない
+
+初回の報告には、実行したコマンド、各コマンドの成否、ローカルサーバーのURL、実際に確認できた画面、未確認の範囲を含めます。サーバー起動後の画面確認ができない環境では、サーバー起動と画面確認を分けて報告します。
+
+その後のSimulator / Emulator確認は、以下の標準手順を使います。
+
+## 12. Local QA
 
 起動方法:
 
@@ -261,7 +327,7 @@ npm run lint
 npm test
 ```
 
-## 12. Release準備
+## 13. Release準備
 
 `docs/RELEASE_CHECKLIST_TEMPLATE.md` をコピーしてゲーム側の `docs/RELEASE_CHECKLIST.md` にします。
 
@@ -278,7 +344,7 @@ npm run release:check
 
 Template初期状態ではProduction用IDがPlaceholderなので失敗します。各ゲーム固有のBundle ID / Package / AdMob ID / EAS Production設定へ置き換えた後に成功させてください。
 
-## 13. Phase 1を標準とする
+## 14. Phase 1を標準とする
 
 ```text
 Phase 1
@@ -292,7 +358,7 @@ Phase 1
 
 目的は機能を増やすことではなく、コアゲームが繰り返し遊ばれるかを早く確認することです。
 
-## 14. Phase 1.5で計測する
+## 15. Phase 1.5で計測する
 
 必要になったらAnalyticsを追加します。
 
@@ -305,7 +371,7 @@ Phase 1
 - play frequency
 - retentionに関係する行動
 
-## 15. Phase 2は当たったゲームだけ
+## 16. Phase 2は当たったゲームだけ
 
 - leaderboard
 - daily challenge / same seed
