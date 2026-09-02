@@ -1,5 +1,7 @@
 # AGENTS.md
 
+> **Rapid Game Factory rule:** 新規ゲームでは静止画モックを別実装へ再現する工程を標準にしません。最初からこのTemplate上のReact Native/Web実装で触れるPlayable Prototypeを作り、採用したモックをそのまま製品へ育てます。Visual確定時は `docs/VISUAL_ACCEPTANCE.md` を `docs/VISUAL_ACCEPTANCE_TEMPLATE.md` から作成し、寸法・色・余白・Typographyなどの具体値を正とします。詳細は `docs/RAPID_GAME_FACTORY.md` を必ず確認してください。
+
 このRepositoryは、つどラボの **Casual Game Template** です。
 
 Codexなどの実装Agentは、作業開始前にこのファイルと、`casual-game-idea` で作成されたゲーム固有の開発プロンプトを確認してください。ゲーム側に `docs/GAME_SPEC.md` / `docs/BUILD_PLAN.md` がある場合は補助資料として確認しますが、開発プロンプトをゲームの意図のソースとして扱います。
