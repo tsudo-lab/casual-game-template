@@ -7,45 +7,45 @@ export interface TutorialSlide {
 }
 
 export const GAME_META = {
-  id: 'replace-me',
-  title: 'NEW GAME',
+  id: 'kage-prototype',
+  title: 'KAGE',
   subtitle: {
-    ja: 'ゲーム固有の一言コピー',
-    en: 'One-line game hook',
+    ja: '過去の自分が、未来の自分を追い詰める。',
+    en: 'Your past self closes in on your future.',
   },
   tutorialSlides: {
     ja: [
       {
         eyebrow: 'STEP 1',
-        title: '最初の操作を説明する',
-        body: '最初の数秒で必要な操作だけを書く。',
+        title: '3案を切り替えて遊ぶ',
+        body: 'TRACE / CHAIN / MISSION のタブを切り替えて、同じ操作感で比較します。',
       },
       {
         eyebrow: 'STEP 2',
-        title: '成立条件を説明する',
-        body: '成功条件やゲームの目的を短く説明する。',
+        title: '影分身は過去の自分',
+        body: '数手前の自分の位置が影分身として残ります。過去の選択が次の判断を難しくします。',
       },
       {
         eyebrow: 'STEP 3',
-        title: '記録更新のコツを説明する',
-        body: '連鎖・倍率・失敗条件など、もう一度遊びたくなる要素を書く。',
+        title: '一番もう一回したい案を選ぶ',
+        body: 'ルール説明の分かりやすさより、実際に触ってまた遊びたくなる案を優先します。',
       },
     ],
     en: [
       {
         eyebrow: 'STEP 1',
-        title: 'EXPLAIN THE FIRST ACTION',
-        body: 'Describe only the action the player needs in the first few seconds.',
+        title: 'PLAY ALL THREE',
+        body: 'Switch between TRACE, CHAIN and MISSION with the same controls.',
       },
       {
         eyebrow: 'STEP 2',
-        title: 'EXPLAIN THE GOAL',
-        body: 'Describe the success condition and the objective in one short step.',
+        title: 'SHADOWS ARE YOUR PAST',
+        body: 'Your previous positions return as shadows and constrain your next move.',
       },
       {
         eyebrow: 'STEP 3',
-        title: 'EXPLAIN THE SCORE CHASE',
-        body: 'Describe chains, multipliers, failure conditions, or the main replay hook.',
+        title: 'PICK THE REPLAYABLE ONE',
+        body: 'Choose the version that makes you want another run, not just the easiest one to explain.',
       },
     ],
   } satisfies Record<AppLanguage, TutorialSlide[]>,
@@ -53,10 +53,10 @@ export const GAME_META = {
     ja: 'スコア',
     en: 'SCORE',
   },
-  shareUrl: 'https://example.com/replace-me',
+  shareUrl: 'https://tsudo-lab.com',
   shareMessage: {
-    ja: (score: number) => `NEW GAMEで${score.toLocaleString()}点！`,
-    en: (score: number) => `I scored ${score.toLocaleString()} in NEW GAME!`,
+    ja: (score: number) => `KAGEで${score.toLocaleString()}点！`,
+    en: (score: number) => `I scored ${score.toLocaleString()} in KAGE!`,
   },
 } as const;
 
