@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, Platform, Share, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import NativeShare from 'react-native-share';
-import { captureRef } from 'react-native-view-shot';
 
 import { AppLanguage, GAME_META } from '../config/game';
 import { GameVisual } from '../design/GameVisual';
@@ -136,6 +134,12 @@ export function GameScreen({ language, hapticsEnabled, onHome }: Props) {
     const message = GAME_META.shareUrl ? `${baseMessage}\n\n${GAME_META.shareUrl}` : baseMessage;
     try {
       if (Platform.OS !== 'web' && shareCardRef.current) {
+        // Native-only modules are loaded lazily so the Web prototype can boot
+        // without evaluating native bindings from react-native-share/view-shot.
+        const [{ captureRef }, { default: NativeShare }] = await Promise.all([
+          import('react-native-view-shot'),
+          import('react-native-share'),
+        ]);
         const uri = await captureRef(shareCardRef, { format: 'png', quality: 1, result: 'tmpfile' });
         await NativeShare.open({
           title: GAME_META.title,
